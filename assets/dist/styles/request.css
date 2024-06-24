@@ -1,0 +1,18 @@
+.request-widget{
+    position: relative;
+}
+.action-items{
+    position: absolute;
+    right: 4px;
+    font-size: 14px;
+}
+.action-items-status{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    font-size: 14px;
+}
+.action-items svg{
+    width: 16px;
+    height: auto;
+}

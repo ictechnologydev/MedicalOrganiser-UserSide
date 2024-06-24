@@ -1,0 +1,25 @@
+.patient-info-section{
+    display: inline-flex;
+    justify-content: flex-start;
+}
+.patient-image-sec{
+
+    background-position: center !important;
+    background-size:cover !important;
+    border-radius: 50px;
+    border: 2px solid #02b2b0;
+    padding: 45px;
+    margin-right: 12px;
+
+}
+.patient-info-id{
+    font-size: 22px;
+    font-weight: bold;
+}
+.patient-message{
+    font-size: 18px;
+    color: teal;
+}
+.profile-information-section{
+    position: relative;
+}
