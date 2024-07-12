@@ -81,6 +81,10 @@
       <input class="form-check-input" type="radio" name="role_id" id="inlineRadio2" value="2">
       <label class="form-check-label" for="inlineRadio2">Doctor</label>
     </div>
+       <div class="form-check form-check-inline mb-4">
+           <input class="form-check-input" type="radio" name="role_id" id="inlineRadio2" value="15">
+           <label class="form-check-label" for="inlineRadio2">Professional</label>
+       </div>
 
     <button class="w-100 btn btn-lg btn-primary sign-in" type="button">Sign in</button>
     <div class="response_section">
@@ -145,6 +149,13 @@ $(".sign-in").on("click", function() {
 
                 window.location.href = "/dashboard";//"/doctor/dashboard";
               },1000);
+              }
+              else if(response.data.user.role.id == '15'){
+                  setTimeout(() => {
+                      setCookies(response)
+
+                      window.location.href = "/dashboard";
+                  },1000);
               }else if(response.data.user.role.id == '3'){
 
                 setTimeout(() => {

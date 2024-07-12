@@ -53,7 +53,7 @@
           justify-content: space-between;
         }
       </style>
-    
+
       <div class="welcome-note-container p-2 d-flex justify-content-end">
          <div class="h6 mt-1 mb-0">
             <button class="btn btn-primary" type="button" class=" offcanvas" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" onclick="add_data(this);">
@@ -135,7 +135,7 @@
          <div class="modal-body edit_modal">
             <img src="{{url('/')}}/threeDotLoder.gif" class="threeDotLoder-edit" width="100" height="100" style="margin-left:40%;" >
             <form action="" class="append_field">
-                 
+
             </form>
          </div>
       </div>
@@ -300,16 +300,17 @@ function create_field_html(field) {
         `;
 
         }
-    } else
+    }
+    else
     if (field['type'] == 'dropdown') {
     value_list =  field['comma_separated_values'];
 
 
-   
+
     html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
 
     for (var i = 0; i < value_list.length; i++) {
-       
+
         var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
 
         html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
@@ -317,7 +318,47 @@ function create_field_html(field) {
 
     html_field += `</select>`;
 }
- else
+    else if (field['type'] == 'multiselect') {
+        value_list = field['comma_separated_values'];
+
+        html_field += `<div class="form-group">`;
+        html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" multiple>`;
+
+        for (var i = 0; i < value_list.length; i++) {
+            var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
+
+            html_field += `
+        <option value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'selected' : ''}>
+            ${value_list[i]['label'].trim()}
+        </option>`;
+        }
+
+        html_field += `</select>`;
+        html_field += `</div>`;
+    }
+
+
+    else
+    if (field['type'] == 'multi_label_dropdown') {
+        value_list =  field['comma_separated_values'];
+
+
+
+        html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+
+        for (var i = 0; i < value_list.length; i++) {
+
+            var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+
+            html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+        }
+
+        html_field += `</select>`;
+    }
+
+
+
+    else
     if (field['type'] == 'textarea') {
         html_field += `
         <textarea class="form-control" id="${field['option']}" name="${field['option']}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
@@ -459,8 +500,8 @@ function submitData(event) {
 
     $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
         var fieldName = $(this).attr('name');
-        var fieldValue = $(this).val(); 
-        
+        var fieldValue = $(this).val();
+
         if($(this).attr('type') == 'date')
         {
            formData[fieldName] = formatDate(fieldValue);
@@ -470,7 +511,7 @@ function submitData(event) {
             formData[fieldName] = fieldValue;
         }
 
-        
+
     });
 
 
@@ -488,7 +529,7 @@ function submitData(event) {
 
             toastr.success("Data inserted successfully");
             $('.offcanvas').offcanvas('hide');
-            location.reload(); 
+            location.reload();
            fetch_all_data(getParams('m_id'),getParams('tb'),'0','',getCookie('user_id'))
 
         },
@@ -510,7 +551,7 @@ function submitData(event) {
 }
 
 function fetchAndEditSection(id, table_name, module_manager_id) {
-   
+
 
     add_data(id);
     $.ajax({
@@ -524,12 +565,12 @@ function fetchAndEditSection(id, table_name, module_manager_id) {
         success: function(response) {
 
             id=id;
-            
+
             data=response.data.module_manager.module_manager_meta;
             add_data(data,id);
-      
+
             loader(false);
-            
+
 
         },
 
@@ -552,7 +593,7 @@ function editData(event) {
     $('.append_field input, .append_field select, .append_field textarea').each(function() {
         var fieldName = $(this).attr('name');
         var fieldValue = $(this).val();
-        
+
         if($(this).attr('type') == 'date')
         {
            formData[fieldName] = formatDate(fieldValue);
@@ -563,7 +604,7 @@ function editData(event) {
         }
     });
 
-    
+
     $.ajax({
         headers: {
             "Accept": "application/json",
@@ -581,7 +622,7 @@ function editData(event) {
             $('.modal').modal('hide');
             var rowIdToUpdate = formData.row_id;
 
-            
+
 
              fetch_all_data(getParams('m_id'),getParams('tb'),'0','',getCookie('user_id'))
 
@@ -653,7 +694,7 @@ function capitalizeFirstLetter(text) {
 }
 
 function add_data(_this, id) {
-      
+
     $('.threeDotLoder-edit').show();
     $('.threeDotLoder').show();
     $.ajax({
@@ -667,17 +708,29 @@ function add_data(_this, id) {
 
 
             var fields = response.data.module_manager.module_manager_meta;
-         
+
 
             var html_field = ``;
 
 
             for (i = 0; i < fields.length; i++) {
-                html_field += `<div class="mb-3" >`
-                html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
-                html_field += create_field_html(fields[i]); 
-                html_field += `</div>`;
-            }
+                    console.log(fields);
+                    html_field += `<div class="mb-3" >`;
+                    html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+
+                    if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {
+                        let commaSeparatedValues = fields[i]['comma_separated_values'];
+                        for (let j = 0; j < commaSeparatedValues.length; j++) {
+                            // Construct the custom label
+                            let customLabel = `Vaccinassion ${j + 1} :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
+                            // Update the label in the comma_separated_values object
+                            commaSeparatedValues[j]['label'] = customLabel;
+                        }
+                    }
+
+                    html_field += create_field_html(fields[i]);
+                    html_field += `</div>`;
+                }
             html_field += `
         <input type="hidden" name="table_name" value="${getParams('tb')}" />
         <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
@@ -691,8 +744,8 @@ function add_data(_this, id) {
             $('.append_fields').html(html_field);
 
             var editfields = _this;
-            
-            
+
+
             var html_fields = ``;
             for (i = 0; i < editfields.length; i++) {
                 html_fields += `<div class="mb-3" >`
@@ -701,7 +754,7 @@ function add_data(_this, id) {
                 html_fields += `</div>`;
             }
 
-         
+
             html_fields += `
 
         <input type="hidden" name="table_name" value="${getParams('tb')}" />
@@ -716,7 +769,7 @@ function add_data(_this, id) {
        if(!id){
             $('.offcanvas select').select2({
             dropdownParent: $('.offcanvas')
-            }); 
+            });
         }else
         {
             $('.edit select').select2({
@@ -724,16 +777,16 @@ function add_data(_this, id) {
             });
         }
 
-        
+
         loader(false);
-        
+
         $('.threeDotLoder-edit').hide();
         $('.threeDotLoder').hide();
- 
-      
-       
-         
-            
+
+
+
+
+
         },
         error: function(response) {
             loader(false);
