@@ -81,6 +81,10 @@
       <input class="form-check-input" type="radio" name="role_id" id="inlineRadio2" value="2">
       <label class="form-check-label" for="inlineRadio2">Doctor</label>
     </div>
+       <div class="form-check form-check-inline mb-4">
+           <input class="form-check-input" type="radio" name="role_id" id="inlineRadio2" value="17">
+           <label class="form-check-label" for="inlineRadio2">Professional</label>
+       </div>
 
     <button class="w-100 btn btn-lg btn-primary sign-in" type="button">Sign in</button>
     <div class="response_section">
@@ -129,12 +133,8 @@ $(".sign-in").on("click", function() {
         success: function(response) {
           loader(false);
           toastr.success(response.message);
-
-
-
               if(response.data.user.verified == 0)
             {
-
                     setTimeout(() =>
                     {
                     window.location.href = "/VerifyUser";
@@ -142,9 +142,14 @@ $(".sign-in").on("click", function() {
             }else if(response.data.user.role.id == '2'){
               setTimeout(() => {
                 setCookies(response)
-
                 window.location.href = "/dashboard";//"/doctor/dashboard";
               },1000);
+              }
+              else if(response.data.user.role.id == '17'){
+                  setTimeout(() => {
+                      setCookies(response)
+                      window.location.href = "/dashboard";
+                  },1000);
               }else if(response.data.user.role.id == '3'){
 
                 setTimeout(() => {
@@ -155,8 +160,6 @@ $(".sign-in").on("click", function() {
             {
               toastr.error('Invalid credentials');
             }
-
-
         },
 
         error: function(response) {
@@ -179,7 +182,6 @@ $(".sign-in").on("click", function() {
     });
 
 });
-
 function setCookies(response) {
 setCookie('nameRole',response.data.user.role.name, '1')
 setCookie('BearerToken',response.data.token, '1')
@@ -187,7 +189,6 @@ setCookie('user_id',response.data.user.id, '1')
 setCookie('user_email',response.data.user.email, '1')
 setCookie('user_role_id',response.data.user.role.id, '1')
 }
-
 function loader(show) {
 
   if(show == true)
@@ -199,19 +200,16 @@ function loader(show) {
     $('.full_loader').addClass('d-none');
   }
   }
-
 function deleteCookie(name) {
   document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 }
 deleteCookie('BearerToken');
-
 function setCookie(cname, cvalue, exdays) {
   const d = new Date();
   d.setTime(d.getTime() + (exdays*24*60*60*1000));
   let expires = "expires="+ d.toUTCString();
   document.cookie = cname + "=" + btoa(cvalue) + ";" + expires + ";path=/";
 }
-
 </script>
 </body>
 </html>
