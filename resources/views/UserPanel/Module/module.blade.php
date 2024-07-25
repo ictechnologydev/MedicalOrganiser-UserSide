@@ -337,7 +337,28 @@
             }
 
             html_field += `</select>`;
-        } else if (field['type'] == 'multiselect') {
+        } 
+        else
+        if (field['type'] == 'multi_layer_inline_dropdown') {
+            value_list = field['comma_separated_values'];
+
+
+
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+
+            for (var i = 0; i < value_list.length; i++) {
+
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+            }
+
+            html_field += `</select>`;
+        }
+        
+        else if (field['type'] == 'multiselect') {
             value_list = field['comma_separated_values'];
 
             html_field += `<div class="form-group">`;
@@ -565,7 +586,7 @@
     function fetchAndEditSection(id, table_name, module_manager_id) {
 
 
-        add_data(id);
+        //add_data(id);
         $.ajax({
             headers: {
                 "Accept": "application/json",
@@ -580,9 +601,10 @@
             },
             success: function(response) {
 
-                id = id;
+                //id = id;
 
                 data = response.data.module_manager.module_manager_meta;
+                
                 add_data(data, id);
 
                 loader(false);
@@ -726,12 +748,27 @@
 
                 var html_field = ``;
 
+                var __check = 0;
+                var __div = 0;
 
                 for (i = 0; i < fields.length; i++) {
                     console.log(fields);
-                    html_field += `<div class="mb-3" >`;
-                    html_field +=
-                        `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+                    
+                if(fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
+                {
+                    html_field += `<div class="d-flex" >`;
+                    __check = 1;
+                    __div = 1;
+                }
+
+                if(fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1)
+                    {
+                        html_field += `</div>`;
+                        __check = 0;
+                        __div = 0;
+                    }
+                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                    html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
                     if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {
                         let commaSeparatedValues = fields[i]['comma_separated_values'];
@@ -746,6 +783,7 @@
 
                     html_field += create_field_html(fields[i]);
                     html_field += `</div>`;
+                   
                 }
                 html_field += `
         <input type="hidden" name="table_name" value="${getParams('tb')}" />
@@ -763,8 +801,23 @@
 
 
                 var html_fields = ``;
+                var __check = 0;
+                var __div = 0;
                 for (i = 0; i < editfields.length; i++) {
-                    html_fields += `<div class="mb-3" >`
+                    if(editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
+                {
+                    html_fields += `<div class="d-flex" >`;
+                    __check = 1;
+                    __div = 1;
+                }
+
+                if(editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1)
+                    {
+                        html_fields += `</div>`;
+                        __check = 0;
+                        __div = 0;
+                    }
+                    html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
                     html_fields +=
                         `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
                     html_fields += create_field_html(editfields[i]);
