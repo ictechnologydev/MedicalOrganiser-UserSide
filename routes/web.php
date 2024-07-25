@@ -15,6 +15,8 @@ Route::get('/forgot-password-otp',function(){ return view('UserPanel.Auth.forgot
 Route::get('/reset-password',function(){return view('UserPanel.Auth.reset-password');});
 Route::get('/pages/{pageId}', function(){ return view('UserPanel.PageDetail');});
 
+Route::get('/shareProfile-allied-professional', function(){ return view('UserPanel.Patient.share-with-professional');});
+Route::get('/shareProfileForm-allied-professional', function(){ return view('UserPanel.Patient.profile-view-professional');});
 
 // Patient routes
 Route::get('/dashboard', function(){return view('UserPanel.Patient.dashboard');})->name('Patient.Dashboard');
