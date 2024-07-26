@@ -775,7 +775,7 @@
                         for (let j = 0; j < commaSeparatedValues.length; j++) {
                             // Construct the custom label
                             let customLabel =
-                                `Vaccinassion ${j + 1} :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
+                                `Schedule :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
                             // Update the label in the comma_separated_values object
                             commaSeparatedValues[j]['label'] = customLabel;
                         }
