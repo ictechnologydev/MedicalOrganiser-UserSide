@@ -256,7 +256,7 @@ function getDoctorslist(from, pagination) {
           type: "GET",
           url: `{{config('app.api_url')}}/api/users/request-to-doctor?patient_id=${getCookie('user_id')}`,
           success: function (response) {
-            var request_to_doctor = response.data.user;
+            var request_to_doctor = response.data;
 
             var searchQuery = $("#search-query").val().toLowerCase();
 

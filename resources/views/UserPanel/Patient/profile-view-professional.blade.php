@@ -205,7 +205,7 @@
                                 type: "GET",
                                 url: `{{config('app.api_url')}}/api/users/request-to-allied-professional?patient_id=${getCookie('user_id')}`,
                                 success: function (response) {
-                                    var request_to_allied_perfessional = response.data.user;
+                                    var request_to_allied_perfessional = response.data;
                                     var searchQuery = $("#search-query").val().toLowerCase();
                                     var filterAlliedProfessional = request_to_allied_perfessional.filter(function (doctor) {
                                         return doctor.id.toString() === searchQuery || doctor.email.includes(searchQuery);
