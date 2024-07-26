@@ -331,9 +331,9 @@
             for (var i = 0; i < value_list.length; i++) {
 
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+               
 
-                html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
@@ -775,7 +775,7 @@
                         for (let j = 0; j < commaSeparatedValues.length; j++) {
                             // Construct the custom label
                             let customLabel =
-                                `Schedule :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
+                                `Schedule  :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
                             // Update the label in the comma_separated_values object
                             commaSeparatedValues[j]['label'] = customLabel;
                         }

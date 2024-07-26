@@ -80,7 +80,7 @@ thead tr th, tbody tr td {
                 <div class="nav-item dropdown d-flex me-3 flex-end justify-content-end">
                    
           <a type="button" href="javascript:void(3);" class="btn btn-primary my-2 ps-3 pe-3 nav-link px-0 show_notification btn btn-primary position-relative">
-            🔔
+            ðŸ””
             <span class="position-absolute top-10 end-20  translate-middle p-1 bg-danger border border-light rounded-circle">
              
             </span>
@@ -143,10 +143,9 @@ thead tr th, tbody tr td {
                 <table id=""class="table table-bordered">
                   <thead style="background-color: #02b2b0;color:white">
                       <tr>
-                            <th>Sr</th>
-                            <th>Date</th>
-                            <th >Action Taker Email</th>
-                            <th >Action Taker Role</th>
+                            <th>Id</th>
+                            <th >Email</th>
+                            <th >Role</th>
                             <th>Module Name</th>
                             <th>EntryId</th>
                             <th>Action Performed</th>
@@ -247,9 +246,7 @@ function getManageHistory(_entryId,from) {
                 var historyData = response.data.historyData;
                 var html = ``;
                 var count = parseInt(response.data.count) < 10 ? 1 : parseInt(response.data.count)/10;
-                 console.log(count,'2count');
                 count = Math.ceil(count);
-                  console.log(count,'3count');
                 var pages_btn = ``;
                 
                 pages_btn += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="$('.active').prev('.p-btn').trigger('onclick');"   >Previous</button>`;
@@ -277,8 +274,7 @@ function getManageHistory(_entryId,from) {
               for(var i=0; i < historyData.length;i++)
               {
                     html +=`<tr>
-                        <td>${from+(i+1)}</td>
-                        <td>${historyData[i]._date ? historyData[i]._date : ""}</td>
+                        <td>${historyData[i]._actionId}</td>
                         <td>${historyData[i]._actionEmail}</td>
                         <td>${historyData[i]._actionRole}</td>
                         <td>${historyData[i]._moduleName}</td>
@@ -358,7 +354,7 @@ function showJsonDetail(id,_entryId,updated) {
                     html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals[key]}</td>`; 
                 }  else
                 {
-                    html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals[key]}</td>`;
+                    html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals[key] ? json_vals[key].replace(/_/g, ' ') : json_vals[key]}</td>`;
                 }
                 
                 html += `</tr>`;
@@ -413,7 +409,7 @@ function showJsonDetail(id,_entryId,updated) {
                      if(json_vals[key] != json_vals_old[key])
                     {
                      $(`td:contains('${key.replace(/_/g, ' ')}'):first`).css('background', '#ccffcc');
-                     html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals_old[key]}</td>`;
+                     html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals_old[key] ? json_vals[key].replace(/_/g, ' ') : json_vals[key]}</td>`;
                     }
                 }
                 
@@ -482,4 +478,4 @@ color: white !important;
 .pagination-class a:hover:not(.active) {background-color: #ddd;}
 </style>
 
-@include('UserPanel.Includes.footer') 
+@include('UserPanel.Includes.footer')
