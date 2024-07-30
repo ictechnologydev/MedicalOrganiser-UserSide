@@ -301,7 +301,7 @@
                 html_field += `
         <div class="form-check">
         <input class="form-check-input" type="radio" name="${field['option']}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] ? field['store_value'] : '' == value_list[i]['label'].trim() ? 'checked' : i=='0' ? 'checked' : '' } >
-        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'].trim()}</label>
+        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
         </div>
         `;
             }
@@ -314,7 +314,7 @@
                 html_field += `
         <div class="form-check">
         <input class="form-check-input" type="checkbox" name="${field['option']}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] ? field['store_value'] : '' == value_list[i]['label'].trim() ? 'checked' : '' }>
-        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'].trim()}</label>
+        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
         </div>
         `;
 
@@ -323,17 +323,13 @@
         if (field['type'] == 'dropdown') {
             value_list = field['comma_separated_values'];
 
-
-
-            html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
 
             for (var i = 0; i < value_list.length; i++) {
 
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
                
-
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label']}</option>`;
+                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ?  String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
@@ -352,7 +348,7 @@
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
 
                 html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
@@ -752,7 +748,6 @@
                 var __div = 0;
 
                 for (i = 0; i < fields.length; i++) {
-                    console.log(fields);
                     
                 if(fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
                 {

@@ -464,6 +464,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
+        
                toastr.success(response.message);
                loader(false);
                $('#editModal').modal('hide');

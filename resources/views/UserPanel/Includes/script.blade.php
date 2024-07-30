@@ -847,12 +847,13 @@ function getprofile(user_id,role_id){
 
     e.preventDefault();
     loader(true);
+    
 
     const formData = new FormData(this);
     formData.append('user_id', getCookie('user_id'));
     formData.append('role_id', getCookie('user_role_id'));
-
-
+  
+   
  $.ajax({
                headers: {
                   "Accept": "application/json",
@@ -865,10 +866,14 @@ function getprofile(user_id,role_id){
             contentType: false,
             success: function(response) {
                toastr.success(response.message);
+             
                loader(false);
+               $('#editform').submit();
                getprofile();
             },
                     error: function(response) {
+                      
+                     console.log(response.responseJSON.data);
                       loader(false);
                       if (response.status == 422) {
                       var errors = response.responseJSON.data;
@@ -892,7 +897,9 @@ function getprofile(user_id,role_id){
 
 
 
+
    $("#editform").on("submit", function(e,user_id,role_id) {
+  
       e.preventDefault();
 
       loader(true);

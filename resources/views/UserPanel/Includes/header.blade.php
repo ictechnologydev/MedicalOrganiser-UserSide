@@ -664,7 +664,7 @@ $("a.dropdown-item").hide();
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-secondary btn-sm" onclick="$('#editModal').modal('hide');" >Close</button>
-        <button type="submit" class="btn btn-primary btn-sm text-white"  onclick=" $('#edit_form').submit();$('#editform').submit()">Update</button>
+        <button type="submit" class="btn btn-primary btn-sm text-white"  onclick="$('#edit_form').submit();">Update</button>
 
       </div>
     </div>
