@@ -357,7 +357,7 @@
         else if (field['type'] == 'multiselect') {
             value_list = field['comma_separated_values'];
 
-            html_field += `<div class="form-group">`;
+            // html_field += `<div class="form-group">`;
             html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" multiple>`;
 
             for (var i = 0; i < value_list.length; i++) {
@@ -370,7 +370,7 @@
             }
 
             html_field += `</select>`;
-            html_field += `</div>`;
+            // html_field += `</div>`;
         } else
         if (field['type'] == 'multi_label_dropdown') {
             value_list = field['comma_separated_values'];

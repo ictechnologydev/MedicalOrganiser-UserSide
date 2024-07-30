@@ -320,7 +320,7 @@ function create_field_html(field) {
         // Check if field['store_value'] matches the current option value
         var isSelected = field['store_value'] && field['store_value'].trim() == String(value_list[i]['value']).trim();
 
-        html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+        html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
     }
 
     html_field += `</select>`;
