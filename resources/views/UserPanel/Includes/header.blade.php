@@ -63,6 +63,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" ></script>
     <style>
+
+
+input[type="date"]::-webkit-datetime-edit, input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-clear-button {
+        position: relative;
+        color:white;
+        }
+
+        input[type="date"]::-webkit-datetime-edit-year-field{
+        position: absolute !important;
+        border-left:1px solid #8c8c8c;
+        padding-left: 6px;
+        left: 74px;
+        color:black;
+        }
+
+        input[type="date"]::-webkit-datetime-edit-month-field{
+        position: absolute !important;
+        border-left:1px solid #8c8c8c;
+        padding-left: 7px;
+        left: 35px;
+        color:black;
+        }
+
+        input[type="date"]::-webkit-datetime-edit-day-field{
+        position: absolute !important;
+        left: 4px;
+        color:black;
+        }
       .doctors-container{
     max-height: 70vh;
     overflow-y: scroll;

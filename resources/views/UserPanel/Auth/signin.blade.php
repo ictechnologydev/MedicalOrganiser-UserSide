@@ -82,8 +82,8 @@
       <label class="form-check-label" for="inlineRadio2">Doctor</label>
     </div>
        <div class="form-check form-check-inline mb-4">
-           <input class="form-check-input" type="radio" name="role_id" id="inlineRadio2" value="17">
-           <label class="form-check-label" for="inlineRadio2">Professional</label>
+           <input class="form-check-input" type="radio" name="role_id" id="inlineRadio17" value="17">
+           <label class="form-check-label" for="inlineRadio17">Allied Professional</label>
        </div>
 
     <button class="w-100 btn btn-lg btn-primary sign-in" type="button">Sign in</button>

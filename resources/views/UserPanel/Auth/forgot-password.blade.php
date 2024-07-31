@@ -68,6 +68,10 @@
       <input class="form-check-input role_id" type="radio" name="role_id" id="inlineRadio2" value="2">
       <label class="form-check-label" for="inlineRadio2">Doctor</label>
     </div>
+    <div class="form-check form-check-inline mb-4">
+      <input class="form-check-input role_id" type="radio" name="role_id" id="inlineRadio17" value="17">
+      <label class="form-check-label" for="inlineRadio17">Allied Professional</label>
+    </div>
     <br>
       <div class="mb-2 mt-5 d-flex justify-content-between d-none" >
      
