@@ -328,6 +328,20 @@ function create_field_html2(field)
                      html_field +=`</select>`;
                   }
                   else
+                  if(field[3] == 'search_able_dropdown')
+                  {
+                     value_list = field[5]
+
+                     html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}"    >`;
+
+                     for(var i=0; i < value_list.length; i++)
+                     {
+                        html_field +=`<option value="${value_list[i]}" ${ field[6] == value_list[i] ? 'selected' : '' } >${value_list[i]}</option>`;
+                     }
+
+                     html_field +=`</select>`;
+                  }
+                  else
                   if(field[3] == 'textarea')
                   {
                      html_field += `
