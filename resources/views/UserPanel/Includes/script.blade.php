@@ -244,7 +244,7 @@ function clearAllCookies() {
 
 
 
-function create_field_html2(field)
+   function create_field_html2(field)
    {
      var  html_field = ``;
 
@@ -283,18 +283,18 @@ function create_field_html2(field)
                   else
                   if(field[3] == 'radio')
                   {
-                     value_list = field[5]
+                    value_list = field[5]
 
-                     for(var i=0; i < value_list.length; i++)
-                     {
+                    for(var i=0; i < value_list.length; i++)
+                    {
 
-                        html_field += `
-                              <div class="form-check">
-                                 <input class="form-check-input" type="radio" name="${field[2]}"   value="${value_list[i].trim()}" ${ field[6] == value_list[i].trim() ? 'checked' : i=='0' ? 'checked' : '' }  >
-                                 <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i].trim()}</label>
-                              </div>
-                        `;
-                     }
+                      html_field += `
+                            <div class="form-check">
+                               <input class="form-check-input" type="radio" name="${field[2]}"   value="${value_list[i].trim()}" ${ field[6] == value_list[i].trim() ? 'checked' : i=='0' ? 'checked' : '' }  >
+                               <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i].trim()}</label>
+                            </div>
+                      `;
+                    }
                   }
                   else
                   if(field[3] == 'checkbox')
@@ -330,7 +330,8 @@ function create_field_html2(field)
                   else
                   if(field[3] == 'search_able_dropdown')
                   {
-                     value_list = field[5]
+                     value_list = field[5];
+
 
                      html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}"    >`;
 
@@ -342,6 +343,71 @@ function create_field_html2(field)
                      html_field +=`</select>`;
                   }
                   else
+                  if(field[3] == 'multipleFieldDropdown')
+                  {
+                      var arr_of_saved  = field[6] ? field[6].slice(',').length : 0;
+
+                      html_field += `<div><label class="mb-1">${field[1]}</label></div>`;
+
+                      if(arr_of_saved == 0)
+                      {
+                        if(field[2] == `disorders` )
+                        {
+
+                          value_list = field[5];
+                          
+                          html_field += `<select class="form-control disorders_class" style="text-transform: capitalize;" >`;
+
+                          for(var i=0; i < value_list.length; i++)
+                          {
+                            html_field +=`<option value="${value_list[i].trim()}" ${ field[6] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+                          }
+
+                          html_field +=`</select>`;
+
+                        }
+                     
+                        if(field[2] == `family_member`)
+                        {
+
+                          value_list = field[5];
+                          
+                          html_field += `<select class="form-control family_member_class" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}" >`;
+
+                          for(var i=0; i < value_list.length; i++)
+                          {
+                            html_field +=`<option value="${value_list[i].trim()}" ${ field[6] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+                          }
+
+                          html_field +=`</select>`;
+
+                        }
+
+                      }
+                      else
+                      {
+                          
+                        // for(k=0; k < arr_of_saved.length; k++)
+                        // {
+                        //   if(field[2] == `disorders` )
+                        //   {
+                        //     value_list = field[5];
+                              
+                        //     html_field += `<select class="form-control disorders_class" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}" >`;
+
+                        //     for(var i=0; i < value_list.length; i++)
+                        //     {
+                        //       html_field +=`<option value="${value_list[i].trim()}" ${ arr_of_saved[k] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+                        //     }
+
+                        //     html_field +=`</select>`;
+
+                        //   }
+                        // }
+
+                      }
+                  }
+                  else
                   if(field[3] == 'textarea')
                   {
                      html_field += `
@@ -350,6 +416,96 @@ function create_field_html2(field)
                   }
 
                   return html_field;
+   }
+
+   function create_multi_field_dropdown_html(field,field2)
+   {
+          var  html_field = ``;
+
+          var arr_of_saved  = field[6].split(',')
+          var arr_of_saved2  = field2[6].split(',')
+          
+          
+          if(arr_of_saved.length == 0)
+          {
+            if(field[2] == `disorders` )
+            {
+
+              value_list = field[5];
+              html_field += `<div class="multi-field-box form-group mt-2 col-12 p-3 mt-1 rounded-3  border border-dark border-2" style="border-style: dotted !important;">`
+              html_field += `<div><label class="mb-1">${field[1]}</label></div>`;
+              html_field += `<div><select class="form-control disorders_class" style="text-transform: capitalize;" >`;
+
+              for(var i=0; i < value_list.length; i++)
+              {
+                html_field +=`<option value="${value_list[i].trim()}" ${ field[6] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+              }
+
+              html_field +=`</select></div>`;
+
+            }
+          
+            if(field2[2] == `family_member`)
+            {
+
+              value_list = field2[5];
+              html_field += `<div><label class="mb-1">${field2[1]}</label></div>`;
+              html_field += `<div><select class="form-control family_member_class" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
+
+              for(var i=0; i < value_list.length; i++)
+              {
+                html_field +=`<option value="${value_list[i].trim()}" ${ field2[6] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+              }
+
+              html_field +=`</select></div></div>`;
+
+            }
+
+          }
+          else
+          {
+              
+            for(k=0; k < arr_of_saved.length; k++)
+            {
+              if(field[2] == `disorders` )
+              {
+
+                value_list = field[5];
+                html_field += `<div class="multi-field-box form-group mt-2 col-12 p-3 mt-1 rounded-3  border border-dark border-2" style="border-style: dotted !important;">`
+                html_field += `<div><label class="mb-1">${field[1]}</label></div>`;
+                html_field += `<div><select class="form-control disorders_class dropdown-toggle" style="text-transform: capitalize;" >`;
+
+                for(var i=0; i < value_list.length; i++)
+                {
+                  html_field +=`<option value="${value_list[i].trim()}" ${ arr_of_saved[k] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+                }
+
+                html_field +=`</select></div>`;
+                
+
+              }
+          
+              if(field2[2] == `family_member`)
+              {
+
+                value_list = field2[5];
+                html_field += `<div><label class="mb-1">${field2[1]}</label></div>`;
+                html_field += `<div><select class="form-control family_member_class dropdown-toggle" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
+
+                for(var i=0; i < value_list.length; i++)
+                {
+                  html_field +=`<option value="${value_list[i].trim()}" ${ arr_of_saved2[k] == value_list[i].trim() ? 'selected' : '' } >${value_list[i].trim()}</option>`;
+                }
+
+                html_field +=`</select></div></div>`;
+
+              }
+
+            }
+
+          }     
+
+      return html_field;
    }
 
 
@@ -529,22 +685,75 @@ error: function(response) {
 }
 
 
+    function append_multi_field() {
+        var lastField = $('.multi-field-box').last();
+        lastField.find('.disorders_class');
+        lastField.find('.family_member_class');
+        var clonedField = lastField.clone();
+        lastField.after(clonedField);
+
+          for(var i=0; i < $('.disorders_class').length; i++)
+          {
+            if ($('.disorders_class').eq(i).hasClass('select2-hidden-accessible')) {
+              $('.disorders_class').eq(i).select2('destroy');
+              $('.disorders_class').eq(i).select2();
+            }
+          }
+
+        
+          for(var i=0; i < $('.family_member_class').length; i++)
+          {
+            if ($('.family_member_class').eq(i).hasClass('select2-hidden-accessible')) {
+                $('.family_member_class').eq(i).select2('destroy');
+                $('.family_member_class').eq(i).select2();
+              }
+          }
+    }
+
+
+    function remove_multi_field() {
+   
+      if($('.multi-field-box').length > 1)
+      {
+        $('.multi-field-box').last().remove();
+      }
+      else
+      {
+        toastr.error("Last one cannot be remove");
+      }
+    }
+
+
 
 
 
    $("#social_form").on("submit", function(e,user_id,role_id) {
       e.preventDefault();
-
-
-
       loader(true);
 
+      
+      var disorders = '';
+      for(var i=0; i < $('.disorders_class').length; i++)
+      {
+        disorders +=  $('.disorders_class').eq(i).val()+',';
+      }
+
+
+      var family_member = '';
+      for(var i=0; i < $('.family_member_class').length; i++)
+      {
+        family_member +=  $('.family_member_class').eq(i).val()+',';
+      }
+
+ 
       const formData = new FormData(this);
-formData.append('user_id', getCookie('user_id'));
-formData.append('role_id', getCookie('user_role_id'));
+      
+      formData.append('user_id', getCookie('user_id'));
+      formData.append('role_id', getCookie('user_role_id'));
+      formData.append('disorders', disorders.replace(/,\s*$/, ""));
+      formData.append('family_member', family_member.replace(/,\s*$/, ""));
 
-
- $.ajax({
+      $.ajax({
                headers: {
                   "Accept": "application/json",
                   "Authorization": `Bearer ${getCookie('BearerToken')}`,
@@ -1373,6 +1582,7 @@ function getParams(name) {
         height:40px;
         text-transform: capitalize;
     }
+
     
     .select2-selection,.select2-selection--single
     {
