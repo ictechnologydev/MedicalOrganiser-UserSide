@@ -75,6 +75,11 @@
       <label class="form-check-label role_id" for="inlineRadio2">Doctor</label>
     </div>
 
+    <div class="form-check form-check-inline mb-4">
+      <input class="form-check-input role_id" type="radio" name="role_id" id="inlineRadio17" value="17">
+      <label class="form-check-label" for="inlineRadio17">Allied Professional</label>
+    </div>
+
 
   <button onclick="verifyUser()"class="w-100 btn btn-lg btn-primary verify" type="button">Verify</button>
   <p class="mt-2 mb-3 text-muted">Back to <a href="{{url('/')}}">SignIn</a>!</p>
