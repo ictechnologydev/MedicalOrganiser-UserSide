@@ -694,7 +694,7 @@ error: function(response) {
 
           for(var i=0; i < $('.disorders_class').length; i++)
           {
-            if ($('.disorders_class').eq(i).hasClass('select2-hidden-accessible')) {
+            if ($('.disorders_class').eq(i).data('select2')) {
               $('.disorders_class').eq(i).select2('destroy');
               $('.disorders_class').eq(i).select2();
             }
@@ -703,7 +703,7 @@ error: function(response) {
         
           for(var i=0; i < $('.family_member_class').length; i++)
           {
-            if ($('.family_member_class').eq(i).hasClass('select2-hidden-accessible')) {
+            if ($('.family_member_class').eq(i).data('select2')) {
                 $('.family_member_class').eq(i).select2('destroy');
                 $('.family_member_class').eq(i).select2();
               }
