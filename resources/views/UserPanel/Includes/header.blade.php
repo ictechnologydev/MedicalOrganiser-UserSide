@@ -721,7 +721,7 @@ $("a.dropdown-item").hide();
       <div style="background-color:#02b2b0;color:white"class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Personal History</h5>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height:80vh;height:80vh;overflow:scroll;">
       <div class="row">
          <div class="col-12">
             <form id="social_form">
@@ -736,7 +736,6 @@ $("a.dropdown-item").hide();
             </form>
          </div>
       </div>
-
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-secondary btn-sm" onclick="$('#socialHistoryModal').modal('hide');" >Close</button>
