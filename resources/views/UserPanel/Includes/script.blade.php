@@ -686,28 +686,33 @@ error: function(response) {
 
 
     function append_multi_field() {
+      // $('.disorders_class').select2('destroy');
+      // $('.family_member_class').select2('destroy');
         var lastField = $('.multi-field-box').last();
         lastField.find('.disorders_class');
         lastField.find('.family_member_class');
         var clonedField = lastField.clone();
         lastField.after(clonedField);
 
-          for(var i=0; i < $('.disorders_class').length; i++)
-          {
-            if ($('.disorders_class').eq(i).data('select2')) {
-              $('.disorders_class').eq(i).select2('destroy');
-              $('.disorders_class').eq(i).select2();
-            }
-          }
+        // $('.disorders_class').select2('destroy');
+        // $('.family_member_class').select2('destroy');
+
+          // for(var i=0; i < $('.disorders_class').length; i++)
+          // {
+          //   if ($('.disorders_class').eq(i).data('select2')) {
+          //     $('.disorders_class').eq(i).select2('destroy');
+          //     // $('.disorders_class').eq(i).select2();
+          //   }
+          // }
 
         
-          for(var i=0; i < $('.family_member_class').length; i++)
-          {
-            if ($('.family_member_class').eq(i).data('select2')) {
-                $('.family_member_class').eq(i).select2('destroy');
-                $('.family_member_class').eq(i).select2();
-              }
-          }
+          // for(var i=0; i < $('.family_member_class').length; i++)
+          // {
+          //   if ($('.family_member_class').eq(i).data('select2')) {
+          //       $('.family_member_class').eq(i).select2('destroy');
+          //       // $('.family_member_class').eq(i).select2();
+          //     }
+          // }
     }
 
 

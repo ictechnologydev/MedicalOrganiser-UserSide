@@ -293,84 +293,84 @@ function create_field_html2(field)
    {
 
 
-    loader(true);
+          loader(true);
 
-const formData={
-
-
-  user_id : getCooki('user_id'),
-  role_id : getCooki('user_role_id')
-}
-
-$.ajax({
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${getCookie('BearerToken')}`,
-            },
-            type: "POST",
-            url: "{{config('app.api_url')}}/api/social-history/get-fields",
-            data: formData,
-            success: function(response) {
-
-            
-               var  fields = response.data.fields;
-
-              var html_field = ``;
-
-              for(i=0;i< fields.length;i++)
-              {
-                  if(fields[i][3] != 'multipleFieldDropdown' ) {
-                    html_field += `<div class="form-group mt-2 col-12">`;
-                    html_field += `<div><label class="mb-1">${fields[i][1]}</label></div>`
-                    html_field += `<div>${create_field_html2(fields[i])}</div>`;
-                    html_field += `</div>`;
-                  }
-
-                  if(fields[i][3] == 'multipleFieldDropdown' &&  fields[i][2] == 'disorders' ) {
-                    html_field += `${create_multi_field_dropdown_html(fields[i],fields[i+1])}`;
-                  }
-                  
-                  
-              }
-
-             html_field += `<a role="button" class="col-md-2 btn badge bg-primary mt-4" onclick="remove_multi_field()">Remove</a>`;
-             html_field += `<a role="button" class="ms-auto col-md-2 btn badge bg-primary mt-4" onclick="append_multi_field()">Add more</a>`;
-
-             $('.append_fields_social').html(html_field);
-             $('.disorders').select2('destroy');
-             $('.family_member').select2('destroy');
+          const formData={
 
 
-
-             $('#social_form .role_id').val(role_id);
-             $('#social_form .user_id').val(user_id);
-
-              loader(false);
-              $('#socialHistoryModal').modal('show');
-              $('#socialHistoryModal select').select2({
-        dropdownParent: $('#socialHistoryModal')
-    });
-              
-
-            },
-            error: function(response) {
-              loader(false);
-              if (response.status == 422) {
-              var errors = response.responseJSON.data;
-              $.each(errors, function(field, messages) {
-                    error_msg = messages[0];
-                    toastr.error(error_msg);
-              });
-              }
-      else  if (response.status == 500) {
-          toastr.error("Something went wrong")
-        }
-        else
-        {
-          toastr.error(response.responseJSON.message)
-        }
+            user_id : getCooki('user_id'),
+            role_id : getCooki('user_role_id')
           }
-});
+
+          $.ajax({
+                      headers: {
+                          "Accept": "application/json",
+                          "Authorization": `Bearer ${getCookie('BearerToken')}`,
+                      },
+                      type: "POST",
+                      url: "{{config('app.api_url')}}/api/social-history/get-fields",
+                      data: formData,
+                      success: function(response) {
+
+                      
+                        var  fields = response.data.fields;
+
+                        var html_field = ``;
+
+                        for(i=0;i< fields.length;i++)
+                        {
+                            if(fields[i][3] != 'multipleFieldDropdown' ) {
+                              html_field += `<div class="form-group mt-2 col-12">`;
+                              html_field += `<div><label class="mb-1">${fields[i][1]}</label></div>`
+                              html_field += `<div>${create_field_html2(fields[i])}</div>`;
+                              html_field += `</div>`;
+                            }
+
+                            if(fields[i][3] == 'multipleFieldDropdown' &&  fields[i][2] == 'disorders' ) {
+                              html_field += `${create_multi_field_dropdown_html(fields[i],fields[i+1])}`;
+                            }
+                            
+                            
+                        }
+
+                      html_field += `<a role="button" class="col-md-2 btn badge bg-primary mt-4" onclick="remove_multi_field()">Remove</a>`;
+                      html_field += `<a role="button" class="ms-auto col-md-2 btn badge bg-primary mt-4" onclick="append_multi_field()">Add more</a>`;
+
+                      $('.append_fields_social').html(html_field);
+
+
+
+                      $('#social_form .role_id').val(role_id);
+                      $('#social_form .user_id').val(user_id);
+
+                        loader(false);
+                        $('#socialHistoryModal').modal('show');
+              //           $('#socialHistoryModal select').select2({
+              //     dropdownParent: $('#socialHistoryModal')
+              // });
+
+              $('.disorders').select2('destroy');
+              $('.family_member').select2('destroy');
+
+                      },
+                      error: function(response) {
+                        loader(false);
+                        if (response.status == 422) {
+                        var errors = response.responseJSON.data;
+                        $.each(errors, function(field, messages) {
+                              error_msg = messages[0];
+                              toastr.error(error_msg);
+                        });
+                        }
+                else  if (response.status == 500) {
+                    toastr.error("Something went wrong")
+                  }
+                  else
+                  {
+                    toastr.error(response.responseJSON.message)
+                  }
+                    }
+          });
 
    }
 
