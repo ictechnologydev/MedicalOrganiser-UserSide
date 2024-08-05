@@ -286,6 +286,36 @@ function create_field_html2(field)
 
                   return html_field;
    }
+
+
+   function bmiCalculator()
+   {
+        if(!isNaN(parseFloat($('#weight_in_kg').val())) && !isNaN(parseFloat($('#height_in_cn').val())))
+        {
+            var weight = parseFloat($('#weight_in_kg').val());
+            var height = parseFloat($('#height_in_cn').val()) / 100;
+            var bmi = (weight / (height * height)).toFixed(0);
+            $('.bmi-result').text(bmi ? bmi : 0 );
+            if (bmi < 18.5) {
+                $('.bmi-category').html('Underweight.');
+            } else if (bmi >= 18.5 && bmi < 24.9) {
+                $('.bmi-category').html('Normal weight.');
+            } else if (bmi >= 25 && bmi < 29.9) {
+                $('.bmi-category').html('Overweight.');
+            } else {
+                $('.bmi-category').html('Obese.');
+            }
+
+        $('#socialHistoryModal').modal('hide');
+        $('#bmicalculatormodal').modal('show');
+        }
+        else
+        {
+          toastr.error('Please enter valid height and weight');
+          return 0;
+        }
+
+   }
    
 
 
@@ -326,9 +356,20 @@ function create_field_html2(field)
                               html_field += `</div>`;
                             }
 
+                            if(i == 1)
+                            {
+                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center" ><button class="btn btn-primary "   onclick="event.preventDefault();bmiCalculator();">Calculate BMI</button></div>`;
+
+                            }
+
+
                             if(fields[i][3] == 'multipleFieldDropdown' &&  fields[i][2] == 'disorders' ) {
+                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center" ><div class="btn badge bg-primary " style="hover:{color:white !important;} font-size:18px;"   >Family History</div></div>`;
+
                               html_field += `${create_multi_field_dropdown_html(fields[i],fields[i+1])}`;
                             }
+
+
                             
                             
                         }
@@ -741,6 +782,36 @@ $("a.dropdown-item").hide();
         <button type="submit" class="btn btn-secondary btn-sm" onclick="$('#socialHistoryModal').modal('hide');" >Close</button>
         <button type="submit" class="btn btn-primary btn-sm"  onclick=" $('#social_form').submit()">Save</button>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade mt-auto" id="bmicalculatormodal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div style="background-color:#02b2b0;color:white"class="modal-header">
+        <h5 class="modal-title" id="">Your BMI SCORE</h5>
+        <button type="button" class="btn-close"  onclick="$('#bmicalculatormodal').modal('hide');$('#socialHistoryModal').modal('show');" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="height:40vh;overflow:hidden;">
+      <div class="row">
+        <div class="col-4">
+            <div class="align-middle bmi-result" style="height:70px; border: 2px solid #02b2b0;border-radius: 10px; background-color:#02b2b0;color:white; text-align: center;font-size:34px;">0</div>
+        </div>
+        <div class="col-8">   
+          <h5 clas="mt-3" style="margin-top: 10px !important;">Your Category<h5>
+          <div class="bmi-category mt-2" style="font-size:14px;color:gray;"></div>
+        </div>
+        <div class="row">
+
+          <div class="col-12 mt-5 text-center">
+          Body Mass Index, or BMI, is a person’s weight in kilograms divided by the square of his/her height in meters. The National Institute of Health (NIH) has now defined BMI to be the deciding parameter to know if you are underweight, normal weight, overweight or obese
+          </div>
+
+      </div>
       </div>
     </div>
   </div>
