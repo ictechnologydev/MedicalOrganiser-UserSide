@@ -9,8 +9,8 @@
             <div class="container-fluid p-3 main-container-content">
                 <div class="row w-100 justify-content-between bordsender border-3 border-primary border-top-0 border-bottom-0 border-end-0 ps-2 ms-0 mb-3">
                     <div class="col-7">
-                        <h3 class="p-0 m-0 bread-crumb-heading">Patient health Professionals</h3>
-                        <small>Dashabord - Patient health Professionals </small>
+                        <h3 class="p-0 m-0 bread-crumb-heading">Patient Allied Professional</h3>
+                        <small>Dashabord - Patient Allied Professional </small>
                     </div>
 
                     <div class="col-3">
@@ -52,14 +52,14 @@
                         </div>
 
                         <div class="col-4">
-                            <input type="text" class="form-control" style="width:100%" id="search-query" placeholder="Search doctor">
+                            <input type="text" class="form-control" style="width:100%" id="search-query" placeholder="Search Allied Professional">
 
                         </div>
                         <div class="col-3">
                             <button class="btn btn-primary" id="search-button">Search</button>
                         </div>
                         <div class="col-3">
-                            <a class="btn btn-primary"href="{{url('/shareProfile')}}">Manage Doctors</a>
+                            <a class="btn btn-primary"href="{{url('/shareProfile-allied-professional')}}">Manage Allied Professional</a>
                         </div>
                     </div>
                     <div class="h6 mt-1 mb-0">
@@ -206,10 +206,14 @@
                                 url: `{{config('app.api_url')}}/api/users/request-to-allied-professional?patient_id=${getCookie('user_id')}`,
                                 success: function (response) {
                                     var request_to_allied_perfessional = response.data;
-                                    var searchQuery = $("#search-query").val().toLowerCase();
+                                    console.log(request_to_allied_perfessional)
+                                    var searchQuery = $("#search-query").val();
+
                                     var filterAlliedProfessional = request_to_allied_perfessional.filter(function (doctor) {
-                                        return doctor.id.toString() === searchQuery || doctor.email.includes(searchQuery);
-                                    });
+                                    return doctor.id.toString() === searchQuery || doctor.email.toString() === searchQuery
+                                    })
+
+                                    console.log(request_to_allied_perfessional)
                                     var html = '';
                                     var userMeta = '';
                                     if (filterAlliedProfessional.length === 0) {

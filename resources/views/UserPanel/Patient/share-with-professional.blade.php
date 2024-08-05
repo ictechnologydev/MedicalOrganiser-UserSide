@@ -11,8 +11,8 @@
             <div class="container-fluid p-3 main-container-content">
                 <div class="row w-100 justify-content-between border border-3 border-primary border-top-0 border-bottom-0 border-end-0 ps-2 ms-0 mb-3">
                     <div class="col-7">
-                        <h3 class="p-0 m-0 bread-crumb-heading">My Health Professionals</h3>
-                        <small>Dashaboard - My Health Professionals</small>
+                        <h3 class="p-0 m-0 bread-crumb-heading">Patient Allied Professional</h3>
+                        <small>Dashaboard - My Allied Professional</small>
                     </div>
                     <div class="col-3">
                         <div class="nav-item dropdown d-flex me-3 flex-end justify-content-end">

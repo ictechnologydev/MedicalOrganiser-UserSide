@@ -750,7 +750,7 @@
                 url: `{{ config('app.api_url') }}/api/users/show-all-requests-to-allied?allied_professional_id=${getCooki('user_id')}&&from=${from}`,
                 success: function(response) {
                     console.log(response);
-                    var detail = response.data.request_to_allied_professionals;
+                    var detail = response.data.request_to_allied;
                     var container = document.getElementById('requestDetails');
                     $('.fw-btn').css('font-weight', '400');
                     $('.btn1').css('font-weight', '800');
@@ -765,8 +765,8 @@
                             `<button type="button" class="btn btn-primary btn-sm ml-1  ${response.data.count == 0 ? 'invisible' : '' }" style="margin-left:10px;" onclick="get_patient_invites_allied(${c*10},1);" >${c+1}</button>`;
                     }
                     $('.pages_btn').html(pages_btn);
+                    console.log(detail);
                     detail.forEach(function(request) {
-                        console.log(request.patient_id,'fdsa')
                         html += '<div class="invite-notification">';
                         html += '<div class="inviter-section">';
                         html += '<div class="patient-info">';

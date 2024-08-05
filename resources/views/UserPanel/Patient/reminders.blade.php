@@ -22,7 +22,7 @@
                     <div class="nav-item dropdown d-flex me-3 flex-end justify-content-end">
                        
           <a type="button" href="javascript:void(3);" class="btn btn-primary my-2 ps-3 pe-3 nav-link px-0 show_notification btn btn-primary position-relative">
-            🔔
+            ðŸ””
             <span class="position-absolute top-10 end-20  translate-middle p-1 bg-danger border border-light rounded-circle">
              
             </span>
@@ -78,22 +78,24 @@
         <form>
             <div class="mb-3">
                 <div class="mb-3">
-                    <label for="title" class="form-label">Reminder Title</label>
+                    <label for="title" class="form-label">Procedure</label>
                     <input type="text" class="form-control title"  name="title"placeholder="Add Title...">
                   </div>
-                <label for="discription" class="form-label">Reminer Description</label>
-                <textarea class="form-control des" name="des"placeholder="I want to add ..."></textarea>
             </div>
 
            
 
               <div class="mb-3">
-                <label for="title" class="form-label">Reminder Date</label>
+                <label for="title" class="form-label">Date</label>
                 <input type="date" class="form-control date"  name="date"placeholder="select date...">
               </div>
               <div class="mb-3">
-                <label for="images" class="form-label">Reminder Time</label>
+                <label for="images" class="form-label">Time</label>
                 <input type="time" class="form-control time"  name="time"placeholder="select Time...">
+              </div>
+               <div class="mb-3">
+                                 <label for="discription" class="form-label">Notes</label>
+                <textarea class="form-control des" name="des"placeholder="I want to add ..."></textarea>  
               </div>
             <button type="button" onclick="store_reminders()" class="btn btn-primary">Save</button>
           </form>
@@ -117,19 +119,21 @@
                 <div class="mb-3">
     
                     <div class="mb-3">
-                        <label for="title" class="form-label">Reminder Title</label>
+                        <label for="title" class="form-label">Procedure</label>
                         <input type="text" class="form-control Etitle" id="title" value=""name="title"placeholder="Add Title...">
                       </div>
-                    <label for="discription" class="form-label">Reminer Description</label>
-                    <textarea class="form-control Edes" id="des" name="des"placeholder="I want to add ..."></textarea>
                 </div>
                   <div class="mb-3">
-                    <label for="title" class="form-label">Reminder Date</label>
+                    <label for="title" class="form-label">Date</label>
                     <input type="date" class="form-control Edate" id="date" name="date"placeholder="select date...">
                   </div>
                   <div class="mb-3">
-                    <label for="images" class="form-label">Reminder Time</label>
+                    <label for="images" class="form-label">Time</label>
                     <input type="time" class="form-control Etime" id="time" name="time"placeholder="select Time...">
+                  </div>
+                   <div class="mb-3">
+                    <label for="discription" class="form-label">Notes</label>
+                    <textarea class="form-control Edes" id="des" name="des" placeholder="I want to add ..."></textarea>
                   </div>
                 <input type="hidden" class="Eid" name="id"value=""id="id">
                 <button type="button" onclick="update_reminders()" class="btn btn-primary">Update</button>
