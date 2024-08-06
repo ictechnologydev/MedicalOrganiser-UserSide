@@ -258,10 +258,10 @@ function getDoctorslist(from, pagination) {
           success: function (response) {
             var request_to_doctor = response.data;
 
-            var searchQuery = $("#search-query").val().toLowerCase();
+            var searchQuery = $("#search-query").val();
 
             var filteredDoctors = request_to_doctor.filter(function (doctor) {
-              return doctor.id.toString() === searchQuery || doctor.email.includes(searchQuery);
+              return doctor.id.toString() === searchQuery || doctor.email == searchQuery;
             });
 
             var html = '';
@@ -277,8 +277,8 @@ function getDoctorslist(from, pagination) {
               
 
               if (matchingRequest) {
-                if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 2) {
-                  buttonLabel = 'Share';
+                if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest. == 2) {
+                  buttonLabel = 'Share';doctor_accept_or_reject
                   buttonClass = 'btn btn-primary btn-sm share-button';
                 }else if(matchingRequest.patient_accept_or_reject == 0 || matchingRequest.patient_accept_or_reject == 2){
                   var buttonLabel = 'Share';

@@ -66,6 +66,18 @@ const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
 return formattedDateTime;
 }
 
+function getCurrentDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  
+  const formattedDateTime = `${year}-${month}-${day}`;
+  return formattedDateTime;
+}
+
 function alarm(alarm_list,alarm_time) {
    
     var index = alarm_time.findIndex((element) => element == getCurrentDateTime());

@@ -150,16 +150,10 @@
                     <div class="widget-card info-widget border border-primary border-2 p-5 rounded-3 text-white"
                         style="background: linear-gradient(to left, #02b2b0,#02c574); height: 100%;">
                         <div class="h2 text-shadow">Request to Support</div>
-                        <p class="text-shadow">Lorem Ipsum is simply dummy text of the printing and typesetting
-                            industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem
-                            Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
-                            the industry's standard dummy text ever since the 1500s. Lorem Ipsum is simply dummy text of
-                            the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy
-                            text ever since the 1500s</p>
-                        <a href="{{ url('/AppSupport') }}" class="btn btn-light px-4 py-2 text-primary shadow">App
-                            Support</a>
+                        <p class="text-shadow">We value your feedback and are committed to providing exceptional support for our solution. If you encounter any issues or need assistance, please reach out to our dedicated support team. Your satisfaction is our priority, and we are here to help you every step of the way.</p>
+                        <a href="{{ url('/AppSupport') }}" class="btn btn-light px-4 py-2 text-primary shadow">App Support</a>
                     </div>
-                </div>
+            </div>
 
 
 
@@ -352,12 +346,7 @@
         <div class="widget-card info-widget border border-primary border-2 p-5 rounded-3 text-white"
              style="background: linear-gradient(to left, #02b2b0,#02c574); height: 100%;">
             <div class="h2 text-shadow">Request to Support</div>
-            <p class="text-shadow">Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy text ever since the
-                1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
-                Ipsum has been the industry's standard dummy text ever since the 1500s. Lorem Ipsum is
-                simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                industry's standard dummy text ever since the 1500s</p>
+            <p class="text-shadow">We value your feedback and are committed to providing exceptional support for our solution. If you encounter any issues or need assistance, please reach out to our dedicated support team. Your satisfaction is our priority, and we are here to help you every step of the way.</p>
             <a href="{{ url('/AppSupport') }}" class="btn btn-light px-4 py-2 text-primary shadow">App
                 Support</a>
         </div>

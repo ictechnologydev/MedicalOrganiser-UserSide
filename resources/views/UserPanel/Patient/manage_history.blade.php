@@ -143,12 +143,9 @@ thead tr th, tbody tr td {
                 <table id=""class="table table-bordered">
                   <thead style="background-color: #02b2b0;color:white">
                       <tr>
-                            <th>Id</th>
                             <th>Date</th>
-                            <th >Email</th>
-                            <th >Role</th>
-                            <th>Module Name</th>
-                            <th>EntryId</th>
+                            <th >Action By</th>
+                            <th >Entity Name</th>
                             <th>Action Performed</th>
                             <th>Action</th>
                       </tr>
@@ -275,14 +272,11 @@ function getManageHistory(_entryId,from) {
               for(var i=0; i < historyData.length;i++)
               {
                     html +=`<tr>
-                        <td>${historyData[i]._actionId}</td>
                         <td>${historyData[i]._date}</td>
-                        <td>${historyData[i]._actionEmail}</td>
-                        <td>${historyData[i]._actionRole}</td>
+                        <td>${historyData[i]._actionId}</td>
                         <td>${historyData[i]._moduleName}</td>
-                        <td>${historyData[i]._entryId}</td>
                         <td>${historyData[i]._action}</td>
-                        <td><a class="btn btn-primary btn-sm"  href="javascript:void(0)" onclick="showJsonDetail(${historyData[i].id},${historyData[i]._entryId},'${historyData[i]._action}')" >Detail</a></td>
+                        <td><a class="btn btn-primary btn-sm"  href="javascript:void(0)" onclick="showJsonDetail(${historyData[i].id},${historyData[i]._entryId},'${historyData[i]._action}',${historyData[i]._actionId})" >Detail</a></td>
                         </tr>`;
                          json_values[historyData[i].id] = JSON.stringify(historyData[i]._json);
                          json_values_old[historyData[i].id] = JSON.stringify(historyData[i]?._json_old);
@@ -328,7 +322,7 @@ function getManageHistory(_entryId,from) {
 
      
 
-function showJsonDetail(id,_entryId,updated) {
+function showJsonDetail(id,_entryId,updated,_actionId) {
     var json_vals = JSON.parse(json_values[id]);
      var json_vals_old = JSON.parse(json_values_old[id]);
     var html = ``;
@@ -354,15 +348,26 @@ function showJsonDetail(id,_entryId,updated) {
                 }  else if(key.includes('date'))
                 { 
                     html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals[key]}</td>`; 
-                }  else
+                }
+                else if(key.includes('by_whom'))
+                { 
+                    html += ``; 
+                } 
+                 else
                 {
                     html += `<td style="text-transform: capitalize;">${key.replace(/_/g, ' ')}</td><td>${json_vals[key] ? json_vals[key].replace(/_/g, ' ') : json_vals[key]}</td>`;
                 }
+
+                
                 
                 html += `</tr>`;
                  
             }
+
+            
         }
+
+        html +=`<tr><td style="text-transform: capitalize;">Chagnes By</td><td>${_actionId}</td></tr>`;
 
     $('.json_value_body').html(html);
     

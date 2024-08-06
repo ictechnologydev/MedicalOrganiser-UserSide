@@ -290,7 +290,7 @@
         } else
         if (field['type'] == 'datepicker') {
             html_field += `
-        <input type="date" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        <input type="date" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         } else
         if (field['type'] == 'radio') {
@@ -736,7 +736,7 @@
             },
             type: "GET",
             url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
-            success: function(response) {
+            success: function(response) { 
 
 
                 var fields = response.data.module_manager.module_manager_meta;

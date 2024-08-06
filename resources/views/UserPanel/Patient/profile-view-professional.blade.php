@@ -210,7 +210,7 @@
                                     var searchQuery = $("#search-query").val();
 
                                     var filterAlliedProfessional = request_to_allied_perfessional.filter(function (doctor) {
-                                    return doctor.id.toString() === searchQuery || doctor.email.toString() === searchQuery
+                                    return doctor.id.toString() === searchQuery || doctor.email == searchQuery
                                     })
 
                                     console.log(request_to_allied_perfessional)

@@ -366,7 +366,7 @@ function create_field_html(field)
                   if(field[3] == 'datepicker')
                   {
                      html_field += `
-                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6]}"  placeholder="${field[1]}">
+                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6] ? field[6] :  getCurrentDate()}"  placeholder="${field[1]}">
                      `;
                   }
                   else
