@@ -624,6 +624,14 @@ function open_section_data_list_page(module_id,module_name,module_table)
     
 }
 
+function open_section_data_list_page_allied(module_id,module_name,module_table)
+{
+  setCookie('section_module_id', module_id, 1);
+  setCookie('section_module_name', module_name, 1);
+  setCookie('section_module_table', module_table, 1);
+  window.location.href = '{{url('/')}}/show-section-data-list-to-allied';
+}
+
 
 
 

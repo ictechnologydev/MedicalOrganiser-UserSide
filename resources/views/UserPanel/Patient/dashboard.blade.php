@@ -207,10 +207,53 @@
                     </div>
 
 
+                  
+
+                  
+
+                    
+
 
 
                 </div>
 
+
+                <div class="modal fade" id="invitation_detail_modal_allied" tabindex="-1"
+                        aria-labelledby="reason-modelLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="reason-modelLabel">Invitation Detail</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+
+                                        <div class="mb-3">
+
+                                            <div class="PatientNoteDiv_allied">Patient Note: </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Want to say something (optional)</label>
+                                            <textarea class="form-control DoctorNoteText_allied"placeholder="Want to say something (optional)"></textarea>
+                                        </div>
+
+                                        <button class="btn btn-light me-2 accept_invitation_btn_allied"
+                                            style="border-color: #02b2b0;border-width: 2px;" data-id=""
+                                            onclick="accept_invitation_fun_allied(this)"><img
+                                                src="/assets/images/check.svg"></button>
+                                        <button class="btn btn-light ml-1 reject_invitation_btn_allied"
+                                            style="border-color: #02b2b0;border-width: 2px;" data-id=""
+                                            onclick="reject_invitation_allied(this)"><img
+                                                src="/assets/images/x.svg"></button>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 <style>
                     .date {
@@ -331,16 +374,16 @@
                             style="margin-left: 10px;" onclick="get_patient_invites_allied(0,0)">New</button>
                     <button type="button" class="btn btn-primary btn-sm ml-1 fw-btn btn2 "
                             style="margin-left: 10px;"
-                            onclick="get_patient_invites_reject_by_doctor(0,0)">Reject by Allied</button>
+                            onclick="get_patient_invites_reject_by_allied(0,0)">Reject by Allied</button>
                     <button type="button" class="btn btn-primary btn-sm ml-1 fw-btn btn3 "
                             style="margin-left: 10px;"
-                            onclick="get_patient_invites_reject_by_patient(0,0)">Reject by patient</button>
+                            onclick="get_patient_invites_reject_by_patient_allied(0,0)">Reject by patient</button>
                 </div>
 
 
             </div>
             <div class="invitation-area">
-                <div id="requestDetails">
+                <div id="requestDetails-allied">
                 </div>
                 <input type="hidden" id="hiddenData" name="id" value="">
                 <!-- End Invitation-->
@@ -361,7 +404,7 @@
             </div>
             <div class="invitation-area">
                 <!-- Start Invitation-->
-                <div id="acceptedPatients">
+                <div id="acceptedPatients_allied">
 
                 </div>
                 <input type="hidden" id="hiddenData" name="id"value="">
@@ -597,6 +640,7 @@
             $('.PatientNoteDiv').html($(_this).attr('data-patient-note') != null && $(_this).attr('data-patient-note') !=
                 '' ? 'Patient Note:<br/> ' + $(_this).attr('data-patient-note') : '');
             $('.DoctorNoteText').val('');
+            console.log('invitation_detail_modal');
             $('#invitation_detail_modal').modal('show');
 
             if ($(_this).attr('data-hide-reject-btn') == 0) {
@@ -613,6 +657,37 @@
             }
         }
 
+
+        function invitation_detail_allied(_this) {
+            $('.reject_invitation_btn_allied').attr('data-id', $(_this).attr('data-id'));
+            $('.accept_invitation_btn_allied').attr('data-id', $(_this).attr('data-id'));
+            $('.PatientNoteDiv_allied').html($(_this).attr('data-patient-note') != null && $(_this).attr('data-patient-note') !=
+                '' ? 'Patient Note:<br/> ' + $(_this).attr('data-patient-note') : '');
+            $('.DoctorNoteText_allied').val('');
+           
+            $('#invitation_detail_modal_allied').modal('show');
+
+            if ($(_this).attr('data-hide-reject-btn') == 0) {
+                $('.reject_invitation_btn_allied').show();
+            } else {
+                $('.reject_invitation_btn_allied').hide();
+            }
+
+
+            if ($(_this).attr('data-hide-accept-btn') == 0) {
+                $('.accept_invitation_btn_allied').show();
+            } else {
+                $('.accept_invitation_btn_allied').hide();
+            }
+        }
+
+
+        
+
+        
+
+       
+
         $(document).ready(function() {
 
             // doctor
@@ -627,8 +702,8 @@
             }
 
             if (getCookie('user_role_id') == '17') {
-                get_patient_invites_allied(0, 0)
-                get_my_patients(0, '', 0);
+                get_patient_invites_allied(0, 0);
+                get_my_patients_allied(0, '', 0);
                 $('.allied__box').removeClass('d-none');
             }
 
@@ -751,7 +826,7 @@
                 success: function(response) {
                     console.log(response);
                     var detail = response.data.request_to_allied;
-                    var container = document.getElementById('requestDetails');
+                    var container = document.getElementById('requestDetails-allied');
                     $('.fw-btn').css('font-weight', '400');
                     $('.btn1').css('font-weight', '800');
                     $('.fw-btn').removeClass('btn-active');
@@ -777,7 +852,7 @@
                         html += '<div class="action-section">';
                         html += '<button class="me-2" data-id="' + request.id + '" data-patient-id="' +
                             request.patient_id + '" data-patient-note="' + request.patient_note +
-                            '" data-hide-reject-btn="0" data-hide-accept-btn="0" onclick="invitation_detail(this);"><i class="fas fa-tasks" style="font-size: 20px;padding: 5px;color:#02b2b0 !important;" ></i></button>';
+                            '" data-hide-reject-btn="0" data-hide-accept-btn="0" onclick="invitation_detail_allied(this);"><i class="fas fa-tasks" style="font-size: 20px;padding: 5px;color:#02b2b0 !important;" ></i></button>';
 
                         html += '</div>';
                         html += '</div>';
@@ -915,6 +990,108 @@
             });
         }
 
+        function get_patient_invites_reject_by_patient_allied(from, pagination) {
+
+if (pagination == 0) {
+    loader(true);
+}
+$.ajax({
+    headers: {
+        "Accept": "application/json",
+        "Authorization": `Bearer ${getCookie('BearerToken')}`,
+    },
+    type: "PUT",
+    url: `{{ config('app.api_url') }}/api/users/show-all-requests-to-allied-reject-by-patient?allied_professional_id=${getCooki('user_id')}&from=${from}`,
+
+    success: function(response) {
+        var detail = response.data.request_to_allied
+        ;
+        var container = document.getElementById('requestDetails-allied');
+        $('.fw-btn').css('font-weight', '400');
+        $('.btn3').css('font-weight', '800');
+
+
+        var html = '';
+
+
+        var count = parseInt(response.data.count) < 10 ? 1 : parseInt(response.data.count) / 10;
+
+        count = count.toFixed(0);
+
+        var pages_btn = ``;
+
+        for (var c = 0; c < count; c++) {
+            pages_btn +=
+                `<button type="button" class="btn btn-primary btn-sm ml-1  ${response.data.count == 0 ? 'invisible' : '' }" style="margin-left:10px;" onclick="get_patient_invites_reject_by_patient(${c*10},1);" >${c+1}</button>`;
+        }
+
+        $('.pages_btn').html(pages_btn);
+
+
+        detail.forEach(function(request) {
+
+
+
+            html += '<div class="invite-notification">';
+            html += '<div class="inviter-section">';
+
+
+            html += '<div class="patient-info">';
+            html += '<div class="patient-id" style="font-weight: 500;" >' +
+                '<b>Patient ID:</b> ' + request.patient_id + '</div>';
+            html += '<div class="patient-message" >' + '<b>Sent on:</b> ' + _formatDate(
+                request.date) + '</div>';
+            //   html += '<div class="patient-message" >' + '<b>Expires in:</b>  ' + expire_data(request.date) + 'd</div>';
+
+            html += '</div>';
+            html += '<div class="action-section">';
+
+
+            //html += '<button class="me-2" data-id="' + request.id + '" data-patient-id="' + request.patient_id + '" data-patient-note="' + request.patient_note + '" onclick="invitation_detail(this);"><i class="fas fa-tasks" style="font-size: 20px;padding: 5px;color:#02b2b0 !important;" ></i></button>';
+
+            html += '</div>';
+            html += '</div>';
+
+            html += '</div>';
+
+            html += '</div>';
+
+
+        });
+
+
+        if (html == '') {
+            html = '<div class="text-center text-muted mt-auto "> No Invites Available </div>';
+        }
+
+
+        container.innerHTML = html;
+
+        document.querySelectorAll('.accept-invite').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var patientId = button.getAttribute('data-patient-id');
+                var patientNote = button.getAttribute('data-patient-note');
+                var id = button.getAttribute('patient_id');
+            });
+        });
+        document.querySelectorAll('.reject-invite').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var patientId = button.getAttribute('data-patient-id');
+
+            });
+        });
+        loader(false);
+
+
+    },
+    error: function(response) {
+
+        loader(false);
+
+    }
+});
+}
+
 
         function get_patient_invites_reject_by_doctor(from, pagination) {
 
@@ -947,6 +1124,109 @@
                     for (var c = 0; c < count; c++) {
                         pages_btn +=
                             `<button type="button" class="btn btn-primary btn-sm ml-1  ${response.data.count == 0 ? 'invisible' : '' }" style="margin-left:10px;" onclick="get_patient_invites_reject_by_doctor(${c*10},1);" >${c+1}</button>`;
+                    }
+
+                    $('.pages_btn').html(pages_btn);
+
+
+                    detail.forEach(function(request) {
+
+
+
+                        html += '<div class="invite-notification">';
+                        html += '<div class="inviter-section">';
+
+
+                        html += '<div class="patient-info">';
+                        html += '<div class="patient-id" style="font-weight: 500;" >' +
+                            '<b>Patient ID:</b> ' + request.patient_id + '</div>';
+                        html += '<div class="patient-message" >' + '<b>Sent on:</b> ' + _formatDate(
+                            request.date) + '</div>';
+                        //   html += '<div class="patient-message" >' + '<b>Expires in:</b>  ' + expire_data(request.date) + 'd</div>';
+
+                        html += '</div>';
+                        html += '<div class="action-section">';
+
+
+                        // html += '<button class="me-2" data-id="' + request.id + '" data-patient-id="' + request.patient_id + '"   data-patient-note="' + request.patient_note + '" data-hide-reject-btn="1" data-hide-accept-btn="0"  onclick="invitation_detail(this);"><i class="fas fa-tasks" style="font-size: 20px;padding: 5px;color:#02b2b0 !important;" ></i></button>';
+
+                        html += '</div>';
+                        html += '</div>';
+
+                        html += '</div>';
+
+                        html += '</div>';
+
+
+                    });
+
+
+                    if (html == '') {
+                        html = '<div class="text-center text-muted mt-auto "> No Invites Available </div>';
+                    }
+
+
+                    container.innerHTML = html;
+
+                    document.querySelectorAll('.accept-invite').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            var patientId = button.getAttribute('data-patient-id');
+                            var patientNote = button.getAttribute('data-patient-note');
+                            var id = button.getAttribute('patient_id');
+                        });
+                    });
+                    document.querySelectorAll('.reject-invite').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            var patientId = button.getAttribute('data-patient-id');
+
+                        });
+                    });
+                    loader(false);
+
+
+                },
+                error: function(response) {
+
+                    loader(false);
+
+                }
+            });
+        }
+
+
+        function get_patient_invites_reject_by_allied(from, pagination) {
+
+            if (pagination == 0) {
+                loader(true);
+            }
+
+            $.ajax({
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${getCookie('BearerToken')}`,
+                },
+                type: "PUT",
+                url: `{{ config('app.api_url') }}/api/users/show-all-requests-to-allied-reject-by-allied?allied_professional_id=${getCooki('user_id')}&from=${from}`,
+
+                success: function(response) {
+
+                  var detail = response.data.request_to_allied;
+                    var container = document.getElementById('requestDetails-allied');
+                    $('.fw-btn').css('font-weight', '400');
+                    $('.btn2').css('font-weight', '800');
+
+
+                    var html = '';
+
+                    var count = parseInt(response.data.count) < 10 ? 1 : parseInt(response.data.count) / 10;
+
+                    count = count.toFixed(0);
+
+                    var pages_btn = ``;
+
+                    for (var c = 0; c < count; c++) {
+                        pages_btn +=
+                            `<button type="button" class="btn btn-primary btn-sm ml-1  ${response.data.count == 0 ? 'invisible' : '' }" style="margin-left:10px;" onclick="get_patient_invites_reject_by_allied(${c*10},1);" >${c+1}</button>`;
                     }
 
                     $('.pages_btn').html(pages_btn);
@@ -1124,6 +1404,118 @@
             });
         }
 
+        function get_my_patients_allied(from, search_id, pagination) {
+
+            if (pagination == 0) {
+                loader(true);
+            }
+
+            $.ajax({
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${getCookie('BearerToken')}`,
+                },
+                type: "POST",
+                url: `{{ config('app.api_url') }}/api/allied/my-patient`,
+                data: {
+                    "from": from,
+                    "search_id": search_id,
+                    "allied_professional_id": getCookie('user_id')
+                },
+
+
+                success: function(response) {
+                    var detail = response.data.my_patient;
+                    var container2 = document.getElementById('acceptedPatients_allied');
+
+                    var html2 = '';
+
+
+                    var count = parseInt(response.data.count) < 10 ? 1 : parseInt(response.data.count) / 10;
+
+                    count = count.toFixed(0);
+
+                    var pages_btn = ``;
+
+                    for (var c = 0; c < count; c++) {
+                        pages_btn +=
+                            `<button type="button" class="btn btn-primary btn-sm ml-1  ${response.data.count == 0 ? 'invisible' : '' }" style="margin-left:10px;" onclick="get_my_patients_allied(${c*10},'',1);" >${c+1}</button>`;
+                    }
+
+                    $('.pages_btn2').html(pages_btn);
+
+
+                    detail.forEach(function(request) {
+
+                        html2 += '<div class="invite-notification">';
+                        html2 += '<div class="inviter-section">';
+                        html2 += '<div class="patient-info">';
+                        html2 += '<div class="patient-id" style="font-weight: 400;" >' +
+                            '<b>Patient ID:</b> ' + request.patient_id + '</div>';
+                        html2 += '<div class="patient-message"  >' + '<b>Accepted Date:</b> ' + request
+                            .accepted_date + '</div>';
+                        html2 += '</div>';
+                        html2 += '<div class="action-section">';
+                        html2 += '<button class="me-2" data-id="' + request.id + '" data-patient-id="' +
+                            request.patient_id + '"   data-patient-note="' + request.patient_note +
+                            '" data-hide-reject-btn="0" data-hide-accept-btn="1"  onclick="invitation_detail_allied(this);"><i class="fas fa-tasks" style="font-size: 20px;padding: 5px;color:#02b2b0 !important;" ></i></button>';
+                        html2 += '<button class="view-profile-allied" data-patient-id="' + request.patient_id +
+                            '" style="padding-top: 11px;" ><img src="/assets/images/user.svg"></button>';
+                        html2 += '</div>';
+                        html2 += '</div>';
+                        html2 += '</div>';
+                        html2 += '</div>';
+
+
+                    });
+
+
+                    if (html2 == '') {
+                        html2 = '<div class="text-center text-muted mt-auto "> No Patients Available </div>';
+                    }
+
+
+                    container2.innerHTML = html2;
+
+                    document.querySelectorAll('.reject-invite').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            var patientId = button.getAttribute('data-patient-id');
+
+                        });
+                    });
+
+                    document.querySelectorAll('.view-profile').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            var id = button.getAttribute('data-patient-id');
+                            setCookie('section_patient', id, 1);
+                            window.location.href = '/show-patient-health-summary-to-doctor';
+
+                        });
+                    });
+
+
+                    document.querySelectorAll('.view-profile-allied').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            var id = button.getAttribute('data-patient-id');
+                            setCookie('section_patient', id, 1);
+                            window.location.href = '/show-patient-health-summary-to-allied';
+
+                        });
+                    });
+
+
+                    loader(false);
+
+
+                },
+                error: function(response) {
+
+                    loader(false);
+
+                }
+            });
+        }
+
 
 
         function accept_invitation_fun(_this) {
@@ -1149,6 +1541,29 @@
             });
         }
 
+        function accept_invitation_fun_allied(_this) {
+            loader(true);
+            const id = _this.getAttribute('data-id');
+            const doctor_note = $('.DoctorNoteText').val();
+            $.ajax({
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${getCookie('BearerToken')}`,
+                },
+                type: "PUT",
+
+                url: `{{ config('app.api_url') }}/api/users/request-status-update-patient-ap?notification_id=${id}&allied_professional_note=${doctor_note}&allied_professional_accept_or_reject=1`,
+                success: function(response) {
+                    console.log(response, '2');
+                    toastr.success('Notification Accepted Successfully');
+                    $('#invitation_detail_modal').modal('hide');
+                    get_patient_invites(0, 0);
+                    get_my_patients(0, '', 0);
+
+                }
+            });
+        }
+
         function reject_invitation(_this) {
             loader(true);
             const id = _this.getAttribute('data-id');
@@ -1160,6 +1575,27 @@
                 },
                 type: "PUT",
                 url: `{{ config('app.api_url') }}/api/users/request-status-update-doctor?notification_id=${id}&doctor_note=${doctor_note}&doctor_accept_or_reject=2`,
+                success: function(response) {
+                    toastr.success('Notification Rejected Successfully');
+                    $('#invitation_detail_modal').modal('hide');
+                    get_patient_invites(0, 0);
+                    get_my_patients(0, '', 0);
+
+                }
+            });
+        }
+
+        function reject_invitation_allied(_this) {
+            loader(true);
+            const id = _this.getAttribute('data-id');
+            const doctor_note = $('.DoctorNoteText').val();
+            $.ajax({
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${getCookie('BearerToken')}`,
+                },
+                type: "PUT",
+                url: `{{ config('app.api_url') }}/api/users/request-status-update-patient-ap?notification_id=${id}&allied_professional_note=${doctor_note}&allied_professional_accept_or_reject=2`,
                 success: function(response) {
                     toastr.success('Notification Rejected Successfully');
                     $('#invitation_detail_modal').modal('hide');

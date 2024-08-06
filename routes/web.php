@@ -43,6 +43,8 @@ Route::get('/doctor/reminders', function(){ return view('UserPanel.Doctor.remind
 
 Route::get('/show-patient-health-summary-to-doctor', function(){ return view('UserPanel.Patient.PatientHealthSummaryShowToDoctor');});
 Route::get('/show-section-data-list-to-doctor', function(){ return view('UserPanel.Module.ShowSectionDataListToDoctor');});
+Route::get('/show-patient-health-summary-to-allied', function(){ return view('UserPanel.Patient.PatientHealthSummaryShowToAllied');});
+Route::get('/show-section-data-list-to-allied', function(){ return view('UserPanel.Module.ShowSectionDataListToAllied');});
 
 
 

@@ -376,7 +376,7 @@
                     "Authorization": `Bearer ${getCookie('BearerToken')}`,
                 },
                 type: "PUT",
-                url: `{{config('app.api_url')}}/api/users/request-status-update-patient-ap?notification_id=${id}&patient_note=${patientNote}&patient_accept_or_reject=${patient_accept_or_reject}`,
+                url: `{{config('app.api_url')}}/api/users/request-status-update-by-patient-ap?notification_id=${id}&patient_note=${patientNote}&patient_accept_or_reject=${patient_accept_or_reject}`,
                 success: function (response) {
                     toastr.success(response.message);
                     $('#rejectModal').modal('hide');

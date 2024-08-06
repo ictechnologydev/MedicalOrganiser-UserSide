@@ -144,6 +144,7 @@ thead tr th, tbody tr td {
                   <thead style="background-color: #02b2b0;color:white">
                       <tr>
                             <th>Id</th>
+                            <th>Date</th>
                             <th >Email</th>
                             <th >Role</th>
                             <th>Module Name</th>
@@ -275,6 +276,7 @@ function getManageHistory(_entryId,from) {
               {
                     html +=`<tr>
                         <td>${historyData[i]._actionId}</td>
+                        <td>${historyData[i]._date}</td>
                         <td>${historyData[i]._actionEmail}</td>
                         <td>${historyData[i]._actionRole}</td>
                         <td>${historyData[i]._moduleName}</td>
