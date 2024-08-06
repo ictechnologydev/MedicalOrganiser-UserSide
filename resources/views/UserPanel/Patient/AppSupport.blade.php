@@ -153,7 +153,24 @@ function store_app_supports() {
             location.reload();
             get_all_app_supports(0);
             loader(false);
-        }
+        },
+        error: function(response) {
+                      loader(false);
+                      if (response.status == 422) {
+                      var errors = response.responseJSON.data;                    
+                      $.each(errors, function(field, messages) {
+                            error_msg = messages[0]; 
+                            toastr.error(error_msg);
+                      });
+                      }
+              else  if (response.status == 500) {
+                  toastr.error("Something went wrong")
+                }
+                else
+                {
+                  toastr.error(response.responseJSON.message)
+                }
+                  }
     });
 }
 
