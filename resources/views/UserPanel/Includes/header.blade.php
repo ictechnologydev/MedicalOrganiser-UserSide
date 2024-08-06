@@ -64,7 +64,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" ></script>
     <style>
 
-
+.hovereffect
+{
+  color: white !important;
+}
 input[type="date"]::-webkit-datetime-edit, input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-clear-button {
         position: relative;
         color:white;
@@ -364,7 +367,7 @@ function create_field_html2(field)
 
 
                             if(fields[i][3] == 'multipleFieldDropdown' &&  fields[i][2] == 'disorders' ) {
-                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center" ><div class="btn badge bg-primary " style="hover:{color:white !important;} font-size:18px;"   >Family History</div></div>`;
+                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center " ><div class="btn badge bg-primary hovereffect" style="hover:{color:white !important;} font-size:18px;"   >Family History</div></div>`;
 
                               html_field += `${create_multi_field_dropdown_html(fields[i],fields[i+1])}`;
                             }
