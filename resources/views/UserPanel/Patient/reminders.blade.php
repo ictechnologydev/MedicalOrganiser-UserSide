@@ -93,8 +93,35 @@
                 <label for="images" class="form-label">Time</label>
                 <input type="time" class="form-control time"  name="time"placeholder="select Time...">
               </div>
+              <div class="mb-3">
+                    <label for="title" class="form-label">By Whom</label>
+                    <select class="form-control form-select  mt-1 bywhom" name="bywhom" id="bywhom" >
+                        <option value="">Select By Whom Doctor / Allied Professional</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="title" class="form-label">Remind Me Before</label>
+                    <select class="form-control form-select  mt-1 alert_before" name="alert_before" id="alert_before" >
+                        <option value="1 Days">1 Days</option>
+                        <option value="2 Days">2 Days</option>
+                        <option value="3 Days">3 Days</option>
+                        <option value="4 Days">4 Days</option>
+                        <option value="5 Days">5 Days</option>
+                        <option value="6 Days">6 Days</option>
+                        <option value="7 Days">7 Days</option>
+                        <option value="8 Days">8 Days</option>
+                        <option value="9 Days">9 Days</option>
+                        <option value="10 Days">10 Days</option>
+                        <option value="11 Days">11 Days</option>
+                        <option value="12 Days">12 Days</option>
+                        <option value="13 Days">13 Days</option>
+                        <option value="14 Days">14 Days</option>
+                        <option value="15 Days">15 Days</option>
+                    </select>
+                  </div>
                <div class="mb-3">
-                                 <label for="discription" class="form-label">Notes</label>
+                                 <label for="discription" class="form-label">Additional Notes</label>
                 <textarea class="form-control des" name="des"placeholder="I want to add ..."></textarea>  
               </div>
             <button type="button" onclick="store_reminders()" class="btn btn-primary">Save</button>
@@ -131,8 +158,38 @@
                     <label for="images" class="form-label">Time</label>
                     <input type="time" class="form-control Etime" id="time" name="time"placeholder="select Time...">
                   </div>
+
+                  <div class="mb-3">
+                    <label for="title" class="form-label">By Whom</label>
+                    <select class="form-control form-select  mt-1 bywhom" name="bywhom" id="Ebywhom" >
+                        <option value="">Select by whome</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="title" class="form-label">Remind Me Before</label>
+                    <select class="form-control form-select  mt-1 Ealert_before" name="alert_before" id="alert_before" >
+                        <option value="1 Days">1 Days</option>
+                        <option value="2 Days">2 Days</option>
+                        <option value="3 Days">3 Days</option>
+                        <option value="4 Days">4 Days</option>
+                        <option value="5 Days">5 Days</option>
+                        <option value="6 Days">6 Days</option>
+                        <option value="7 Days">7 Days</option>
+                        <option value="8 Days">8 Days</option>
+                        <option value="9 Days">9 Days</option>
+                        <option value="10 Days">10 Days</option>
+                        <option value="11 Days">11 Days</option>
+                        <option value="12 Days">12 Days</option>
+                        <option value="13 Days">13 Days</option>
+                        <option value="14 Days">14 Days</option>
+                        <option value="15 Days">15 Days</option>
+                    </select>
+                  </div>
+
+                  
                    <div class="mb-3">
-                    <label for="discription" class="form-label">Notes</label>
+                    <label for="discription" class="form-label">Additional Notes</label>
                     <textarea class="form-control Edes" id="des" name="des" placeholder="I want to add ..."></textarea>
                   </div>
                 <input type="hidden" class="Eid" name="id"value=""id="id">
@@ -170,10 +227,10 @@ function convertTo24Time(time12) {
 
  function store_reminders() {
   
-    if($('.des').val()  =='' ||  $('.title').val()  =='' ||  $('.time').val()  =='')
+    if($('.des').val()  =='' ||  $('.title').val()  =='' ||  $('.date').val() == '' ||  $('.time').val()  =='' ||  $('.alert_before').val()  =='' ||  $('#bywhom').val()  =='')
     {
-          toastr.error("All fields are required");
-          return 0;
+        toastr.error("All fields are required");
+        return 0;
     }
     
     loader(true);
@@ -189,6 +246,8 @@ function convertTo24Time(time12) {
             "des": $('.des').val(),
             "title": $('.title').val(),
             "date": $('.date').val(),
+            "bywhom": $('#bywhom').val(),
+            "alert_before": $('.alert_before').val(),
             "time": convertToAMPM($('.time').val()),
             "status": 1,
             "web": 1,
@@ -247,6 +306,10 @@ function convertToAMPM(time24) {
 
 }
 
+
+
+
+
 function unique_number() {
    return  Math.floor(1000 + Math.random() * 9000);
 }
@@ -269,7 +332,7 @@ function send_request() {
         "module_id": $('.module_id').val(),
         user_id: getCookie('user_id')
     }
-    console.log(formData);
+
     $.ajax({
         headers: {
             "Accept": "application/json",
@@ -346,8 +409,25 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 descriptionElement.style.color = '#B9B4C7';
                 descriptionElement.style.fontStyle = 'none';
                 descriptionElement.style.fontWeight = '100';
-                descriptionElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Description :</small>${update.des}</strong>`;
+                descriptionElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Additional Notes :</small>${update.des}</strong>`;
                 innerDiv.appendChild(descriptionElement);
+
+                const ByWhomElement = document.createElement('div');
+                ByWhomElement.className = 'text-secondary my-1';
+                ByWhomElement.style.color = '#B9B4C7';
+                ByWhomElement.style.fontStyle = 'none';
+                ByWhomElement.style.fontWeight = '100';
+                ByWhomElement.innerHTML = `<strong><small style="color:black;font-weight:bold">By Whom :</small>${update.bywhom}</strong>`;
+                innerDiv.appendChild(ByWhomElement);
+
+
+                const AdditionalNotesElement = document.createElement('div');
+                AdditionalNotesElement.className = 'text-secondary my-1';
+                AdditionalNotesElement.style.color = '#B9B4C7';
+                AdditionalNotesElement.style.fontStyle = 'none';
+                AdditionalNotesElement.style.fontWeight = '100';
+                AdditionalNotesElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Remind Me Before :</small>${update.alert_before}</strong>`;
+                innerDiv.appendChild(AdditionalNotesElement);
 
 
 
@@ -582,6 +662,8 @@ function editReminder(updateId) {
             $('.Eid').val(reminder.id);
             $('.Etitle').val(reminder.title);
             $('.Edes').val(reminder.des);
+            $('#Ebywhom').val(reminder.bywhom);
+            $('.Ealert_before').val(reminder.alert_before);
             $('.Etime').val(convertTo24Time(reminder.time));
             $('.Edate').val(convertDateFormat(reminder.date));
             $('#reminderUpdate').modal('show');
@@ -622,6 +704,8 @@ var formData = {
         "des": $('.Edes').val(),
         "title": $('.Etitle').val(),
         "date": $('.Edate').val(),
+        "alert_before": $('.Ealert_before').val(),
+        "bywhom": $('#Ebywhom').val(),
         "time": convertToAMPM($('.Etime').val())
     };
     loader(true);
@@ -648,9 +732,56 @@ var formData = {
 
 $(document).ready(function() {
     get_all_reminders();
+    fetchAcceptedDoctorAndAllied();
   
 
 });
+
+function fetchAcceptedDoctorAndAllied() {
+    $.ajax({
+        headers: {
+            // "Accept": "application/json",
+            "Authorization": `Bearer ${getCookie('BearerToken')}`,
+        },
+        type: "POST",
+        url: `{{config('app.api_url')}}/api/users/fetch-accepted-doctor-and-allied`,
+        // contentType: "application/json",
+        data: { 'patient_id' : getCookie('user_id')},
+        success: function(response) {
+            var my_doctor_and_allied = response.data.my_doctor_and_allied;
+            
+
+            var html =`<option value="">Select By Whom Doctor / Allied Professional</option>`;
+            for(var i = 0; i< my_doctor_and_allied.length; i++)
+            {
+              html +=`<option value="${my_doctor_and_allied[i].email}" >${my_doctor_and_allied[i]?.role?.name} : ${my_doctor_and_allied[i].email}</option>`;
+            }
+
+            $('.bywhom').html(html);
+            
+            
+       
+        },
+        error: function(response) {
+
+            if (response.status == 422) {
+                var errors = response.responseJSON.data;
+                $.each(errors, function(field, messages) {
+                    error_msg = messages[0];
+                    toastr.error(error_msg);
+                });
+            }
+            else  if (response.status == 500) {
+                toastr.error("Something went wrong")
+            }
+            else
+            {
+                toastr.error(response.responseJSON.message)
+            }
+        }
+    });
+}
+
 
 function loader(show) {
 

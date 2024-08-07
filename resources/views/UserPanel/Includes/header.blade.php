@@ -66,7 +66,8 @@
 
 .hovereffect
 {
-  color: white !important;
+  color:  white   !important;
+  cursor: default !important;
 }
 input[type="date"]::-webkit-datetime-edit, input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-clear-button {
         position: relative;

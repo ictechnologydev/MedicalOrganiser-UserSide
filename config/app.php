@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME'),
     
-    'api_url' => "https://doctorapp.gtechsol.au",
+    'api_url' => "https://www.admin.medicalorganiser.com.au",
 
     /*
     |--------------------------------------------------------------------------

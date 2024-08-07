@@ -19,7 +19,7 @@ const headers = new Headers({
   'Accept': 'application/json',
   'Authorization': `Bearer ${_BearerToken}`
 });
-fetch('https://doctorapp.gtechsol.au/api/check-Bearer-token', {
+fetch('https://www.admin.medicalorganiser.com.au/api/check-Bearer-token', {
   method: 'GET',
   headers: headers
 })
