@@ -367,7 +367,7 @@ function create_field_html2(field)
 
 
                             if(fields[i][3] == 'multipleFieldDropdown' &&  fields[i][2] == 'disorders' ) {
-                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center " ><div class="btn badge bg-primary hovereffect" style="hover:{color:white !important;} font-size:1rem;"   >Family History</div></div>`;
+                              html_field += `<div class="form-group mt-4 col-12 d-flex justify-content-center " ><div class="btn  bg-primary hovereffect" style="hover:{color:white !important;} font-size:1rem;"   >Family History</div></div>`;
 
                               html_field += `${create_multi_field_dropdown_html(fields[i],fields[i+1])}`;
                             }
