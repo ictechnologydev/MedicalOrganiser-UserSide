@@ -333,7 +333,7 @@ function create_field_html(field) {
         if (field['type'] == 'dropdown') {
             value_list = field['comma_separated_values'];
 
-            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
 
             for (var i = 0; i < value_list.length; i++) {
 
@@ -670,6 +670,13 @@ function editData(event) {
         }
     });
 }
+
+
+    function medicationOnChange()
+    {
+        
+        $(".showAtChange").removeClass("d-none")
+    }
 
 function _delete_csv_data(id, table_name) {
 
