@@ -43,6 +43,10 @@
    {
        width: 25% !important;
    }
+   .select2.select2-container.select2-container--default{
+        padding: 0px !important;
+        height: auto !important;
+    }
 </style>
 <div>
    <div class="container-fluid p-3 main-container-content">

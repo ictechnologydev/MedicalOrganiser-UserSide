@@ -358,7 +358,7 @@ function clearAllCookies() {
                   {
                      value_list = field[5]
 
-                     html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}"    >`;
+                     html_field += `<select class="form-select" style="text-transform: capitalize;" id="${field[2]}" name="${field[2]}"    >`;
 
                      for(var i=0; i < value_list.length; i++)
                      {
@@ -474,7 +474,7 @@ function clearAllCookies() {
               value_list = field[5];
               html_field += `<div class="multi-field-box form-group mt-2 col-12 p-3 mt-1 rounded-3  border border-dark border-2" style="border-style: dotted !important;">`
               html_field += `<div><label class="mb-1">${field[1]}</label></div>`;
-              html_field += `<div><select class="form-control disorders_class" style="text-transform: capitalize;" >`;
+              html_field += `<div><select class="form-select disorders_class " style="text-transform: capitalize;" >`;
 
               for(var i=0; i < value_list.length; i++)
               {
@@ -490,7 +490,7 @@ function clearAllCookies() {
 
               value_list = field2[5];
               html_field += `<div><label class="mb-1">${field2[1]}</label></div>`;
-              html_field += `<div><select class="form-control family_member_class" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
+              html_field += `<div><select class="form-select family_member_class" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
 
               for(var i=0; i < value_list.length; i++)
               {
@@ -513,7 +513,7 @@ function clearAllCookies() {
                 value_list = field[5];
                 html_field += `<div class="multi-field-box form-group mt-2 col-12 p-3 mt-1 rounded-3  border border-dark border-2" style="border-style: dotted !important;">`
                 html_field += `<div><label class="mb-1">${field[1]}</label></div>`;
-                html_field += `<div><select class="form-control disorders_class dropdown-toggle" style="text-transform: capitalize;" >`;
+                html_field += `<div><select class="form-select disorders_class dropdown-toggle" style="text-transform: capitalize;" >`;
 
                 for(var i=0; i < value_list.length; i++)
                 {
@@ -530,7 +530,7 @@ function clearAllCookies() {
 
                 value_list = field2[5];
                 html_field += `<div><label class="mb-1">${field2[1]}</label></div>`;
-                html_field += `<div><select class="form-control family_member_class dropdown-toggle" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
+                html_field += `<div><select class="form-select family_member_class dropdown-toggle" style="text-transform: capitalize;" id="${field2[2]}" name="${field2[2]}" >`;
 
                 for(var i=0; i < value_list.length; i++)
                 {
