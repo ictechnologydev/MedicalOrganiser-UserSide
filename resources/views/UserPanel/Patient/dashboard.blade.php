@@ -1545,9 +1545,7 @@ $.ajax({
                 success: function(response) {
                     console.log(response, '2');
                     toastr.success('Notification Accepted Successfully');
-                    $('#invitation_detail_modal').modal('hide');
-                    get_patient_invites(0, 0);
-                    get_my_patients(0, '', 0);
+                    window.location.href = "/dashboard";
 
                 }
             });

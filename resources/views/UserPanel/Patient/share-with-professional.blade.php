@@ -66,7 +66,6 @@
                             <th>Sr</th>
                             <th>Allied Professional Id</th>
                             <th>Email</th>
-                            <th>Allied Id Number</th>
                             <th>Send Date</th>
                             <th>Accepted Date</th>
                             <th>Action</th>
@@ -285,7 +284,7 @@
                         }
                         html +=`
 
-        <td>${obj.doctor_id_number}</td>
+  
 
 
 

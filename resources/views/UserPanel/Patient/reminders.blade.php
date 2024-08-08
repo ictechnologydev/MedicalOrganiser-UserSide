@@ -22,7 +22,7 @@
                     <div class="nav-item dropdown d-flex me-3 flex-end justify-content-end">
                        
           <a type="button" href="javascript:void(3);" class="btn btn-primary my-2 ps-3 pe-3 nav-link px-0 show_notification btn btn-primary position-relative">
-            ðŸ””
+            🔔
             <span class="position-absolute top-10 end-20  translate-middle p-1 bg-danger border border-light rounded-circle">
              
             </span>
@@ -367,7 +367,7 @@ function checkAndTriggerAlarms(requestUpdates) {
 }
 
 function get_all_reminders(user_id, calendarTime, page = 1) {
-    loader(true);
+    // loader(true);
     
     const perPage = 10;
     const container = $('#reminderContainer');
