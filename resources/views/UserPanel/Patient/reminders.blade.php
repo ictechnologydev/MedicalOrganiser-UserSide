@@ -103,7 +103,8 @@
                   <div class="mb-3">
                     <label for="title" class="form-label">Remind Me Before</label>
                     <select class="form-control form-select  mt-1 alert_before" name="alert_before" id="alert_before" >
-                        <option value="1 Days">1 Days</option>
+                        <option value="">Select Remind Me Before</option>
+                        <option value="1 Day">1 Day</option>
                         <option value="2 Days">2 Days</option>
                         <option value="3 Days">3 Days</option>
                         <option value="4 Days">4 Days</option>
@@ -169,7 +170,8 @@
                   <div class="mb-3">
                     <label for="title" class="form-label">Remind Me Before</label>
                     <select class="form-control form-select  mt-1 Ealert_before" name="alert_before" id="alert_before" >
-                        <option value="1 Days">1 Days</option>
+                        <option value="">Select Remind Me Before</option>    
+                        <option value="1 Day">1 Day</option>
                         <option value="2 Days">2 Days</option>
                         <option value="3 Days">3 Days</option>
                         <option value="4 Days">4 Days</option>
@@ -426,7 +428,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 AdditionalNotesElement.style.color = '#B9B4C7';
                 AdditionalNotesElement.style.fontStyle = 'none';
                 AdditionalNotesElement.style.fontWeight = '100';
-                AdditionalNotesElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Remind Me Before :</small>${update.alert_before}</strong>`;
+                AdditionalNotesElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Remind Me Before :</small>${update.alert_before ? update.alert_before :  "-" }</strong>`;
                 innerDiv.appendChild(AdditionalNotesElement);
 
 

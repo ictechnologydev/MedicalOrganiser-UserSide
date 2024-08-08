@@ -277,7 +277,7 @@ function getDoctorslist(from, pagination) {
               
 
               if (matchingRequest) {
-                if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest. == 2) {
+                if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject  == 2) {
                   buttonLabel = 'Share';doctor_accept_or_reject
                   buttonClass = 'btn btn-primary btn-sm share-button';
                 }else if(matchingRequest.patient_accept_or_reject == 0 || matchingRequest.patient_accept_or_reject == 2){

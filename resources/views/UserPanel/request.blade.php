@@ -156,7 +156,7 @@ function fetch_modules_name() {
                 }
             }
 
-        $('.offcanvas select').select2({ 
+        $('.offcanvas select').select2({
             dropdownParent: $('.offcanvas')
         });
             loader(false);

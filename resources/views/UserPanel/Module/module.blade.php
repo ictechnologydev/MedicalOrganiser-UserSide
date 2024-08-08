@@ -323,7 +323,7 @@
         if (field['type'] == 'dropdown') {
             value_list = field['comma_separated_values'];
 
-            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
 
             for (var i = 0; i < value_list.length; i++) {
 
@@ -358,7 +358,7 @@
             value_list = field['comma_separated_values'];
 
             // html_field += `<div class="form-group">`;
-            html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" multiple>`;
+            html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" data-placeholder="Please  select values"  multiple>`;
 
             for (var i = 0; i < value_list.length; i++) {
                 var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
@@ -675,6 +675,13 @@
         });
     }
 
+
+    function medicationOnChange()
+    {
+        
+        $(".showAtChange").removeClass("d-none")
+    }
+
     function _delete_csv_data(id, table_name) {
 
         swal({
@@ -762,7 +769,7 @@
                         __check = 0;
                         __div = 0;
                     }
-                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}  " >`;
                     html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
                     if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {

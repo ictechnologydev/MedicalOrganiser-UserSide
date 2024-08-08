@@ -9,7 +9,7 @@
         <div class="modal-body">
             <b>Title: </b><span class="alarm_title"></span>
             <br/>
-            <b>Description: </b><span class="alarm_description"></span>
+            <b>Additional Notes: </b><span class="alarm_description"></span>
         </div>
                 <div class="modal-footer">
                     <button type="button" onclick="sound.pause();$('#alarm_modal').modal('hide');" class="btn btn-primary">close</button>
@@ -78,25 +78,55 @@ function getCurrentDate() {
   return formattedDateTime;
 }
 
-function alarm(alarm_list,alarm_time) {
+function alarm(alarm_list,alarm_time,remind_me_before) {
    
     var index = alarm_time.findIndex((element) => element == getCurrentDateTime());
+    var index2 = remind_me_before.findIndex((element) => element == getCurrentDateTime());
     
     if (index !== -1) {
     
+      sound.play();
+      $('#alarm_modal').modal('show');
+      $('.alarm_title').html(alarm_list[index].title);
+      $('.alarm_description').html(alarm_list[index].des);
+    }
+
+
+    if (index2 !== -1) {
+    
     sound.play();
     $('#alarm_modal').modal('show');
-    $('.alarm_title').html(alarm_list[index].title)
-    $('.alarm_description').html(alarm_list[index].des);
-  
+    $('.alarm_title').html(alarm_list[index2].title);
+    $('.alarm_description').html(alarm_list[index2].des);
+  }
     
-    }
+}
+
+function subtractDays(date, value) {
+    // Convert the value string (e.g., "2 Days") into an integer
+    var daysToSubtract = value ? parseInt(value.split(' ')[0], 10) : 0;
     
+    // Create a new Date object from the passed date (assuming the date is in "dd/mm/yyyy" format)
+    var parts = date.split('/');
+    var originalDate = new Date(parts[2], parts[1] - 1, parts[0]); // Convert to Date object
+    
+    // Subtract the specified number of days
+    originalDate.setDate(originalDate.getDate() - daysToSubtract);
+    
+    // Format the date back to "dd/mm/yyyy"
+    var day = originalDate.getDate();
+    var month = originalDate.getMonth() + 1; // Months are zero-indexed
+    var year = originalDate.getFullYear();
+    
+    var formattedDate = (day < 10 ? '0' + day : day) + '/' + (month < 10 ? '0' + month : month) + '/' + year;
+    
+    return formattedDate;
 }
 
 function reminders_for_alarm() {
 var alarm_list = [];
 var alarm_time = [];
+var remind_me_before = [];
 
 $.ajax({
 headers: {
@@ -112,27 +142,25 @@ var reminders  =  response.data.reminders;
 
 for(var i=0; i< reminders.length; i++)
 {
-if(reminders[i].status == 1){
+  if(reminders[i].status == 1){
 
-//1
-alarm_list[i] = {
-"alarm_time"  : `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`,
-"title" : reminders[i].title,
-"des"   : reminders[i].des
-} 
+    alarm_list[i] = {
+      "alarm_time"  : `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`,
+      "remind_me_before" :  `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`,
+      "title" : reminders[i].title,
+      "des"   : reminders[i].des
+    } 
 
-//2
-alarm_time[i] = `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`;
+    alarm_time[i] = `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`;
+    remind_me_before[i] = `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`;
 
+
+    console.log(convertDateFormat_(reminders[i].date),convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before)))
+  }
 }
-}
-
-
-// console.log(alarm_list);
-// console.log(alarm_time);
 
 setInterval(function() {
-  alarm(alarm_list, alarm_time);
+  alarm(alarm_list, alarm_time,remind_me_before);
 }, 58000);
 
 }
@@ -289,7 +317,7 @@ function clearAllCookies() {
                   if(field[3] == 'datepicker')
                   {
                      html_field += `
-                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6] ? field[6] : '' }"  placeholder="${field[1]}">
+                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6] ? convertDateFormat_(field[6]) : '' }"  placeholder="${field[1]}">
                      `;
                   }
                   else

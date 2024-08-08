@@ -364,7 +364,7 @@ function create_field_html(field) {
             value_list = field['comma_separated_values'];
 
             // html_field += `<div class="form-group">`;
-            html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" multiple>`;
+            html_field += `<select class="form-control"  placeholder="Please  choose any value"  id="${field['option']}" name="${field['option']}" multiple>`;
 
             for (var i = 0; i < value_list.length; i++) {
                 var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());

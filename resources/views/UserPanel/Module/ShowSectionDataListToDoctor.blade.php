@@ -276,7 +276,7 @@ function create_field_html(field) {
 
         if (field['type'] == 'text') {
             html_field += `
-        <input type="text" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        <input type="text" class="form-control" placeholder="Please  choose any value" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         }
         if (field['type'] == 'number') {
