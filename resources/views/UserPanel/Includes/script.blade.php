@@ -317,7 +317,7 @@ function clearAllCookies() {
                   if(field[3] == 'datepicker')
                   {
                      html_field += `
-                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6] ? convertDateFormat_(field[6]) : '' }"  placeholder="${field[1]}">
+                     <input type="date" class="form-control" id="${field[2]}" name="${field[2]}"   value="${field[6] ? AnyformatDateToYYYYMMDD(field[6]) : '' }"  placeholder="${field[1]}">
                      `;
                   }
                   else
@@ -1228,6 +1228,24 @@ formData.append('role_id', getCookie('user_role_id'));
     $('#editform').submit(user_id,role_id);
 
 
+}
+
+function AnyformatDateToYYYYMMDD(date) {
+    // Create a new Date object from the input date
+    const d = new Date(date);
+
+    // Check if the date is valid
+    if (isNaN(d.getTime())) {
+        return "Invalid Date";
+    }
+
+    // Get the year, month, and day from the date
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    // Return the date in yyyy-mm-dd format
+    return `${year}-${month}-${day}`;
 }
 
  function getSettings(){
