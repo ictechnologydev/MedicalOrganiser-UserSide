@@ -44,13 +44,7 @@
                     <div class="widget-card info-widget border border-primary border-2 p-5 rounded-3 text-white"
                         style="background: url('<?php echo url('/'); ?>/assets/images/widgetbackground.png'); background-position: center; background-size: cover; height: 100%;">
                         <div class="h2 text-shadow">Share Your Profile with Doctor</div>
-                        <p class="text-shadow">Lorem Ipsum is simply dummy text of the printing and typesetting
-                            industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when
-                            an unknown printer took a galley of type and scrambled it to make a type specimen book. It
-                            has survived not only five centuries, but also the leap into electronic typesetting,
-                            remaining essentially unchanged. It was popularised in the 1960s with the release of
-                            Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
-                            software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                        <p class="text-shadow">This feature allows users to connect directly with licensed medical doctors for personalized healthcare services. Users can browse through a curated list of doctors, each with a unique ID, and search by specialty, location, or experience. Detailed profiles provide insights into the doctor`s qualifications, areas of expertise, and patient reviews, helping users make informed decisions. Once the right doctor is selected, users can easily request a consultation or medical service by selecting the doctor`s ID and providing a brief description of their health concern.</p>
                         <a href="/shareProfile"
                             onclick="getDoctorslist(event)" class="btn btn-light px-4 py-2 text-primary shadow">Share
                             Now</a>
@@ -65,8 +59,7 @@
                     <div class="widget-card info-widget border border-primary border-2 p-5 rounded-3 text-white"
                         style="background: linear-gradient(to left, #02b2b0,#02c574); height: 100%;">
                         <div class="h2 text-shadow">Submit a Medical Request</div>
-                        <p class="text-shadow">Lorem Ipsum is simply dummy text of the printing and typesetting
-                            industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                        <p class="text-shadow">Submit a medical request to the admin. We are here to help you.</p>
                         <a onclick="Request()" class="btn btn-light px-4 py-2 text-primary shadow"
                             data-bs-toggle="modal" data-bs-target="#submitRequest">Submit Request</a>
                     </div>
@@ -77,8 +70,7 @@
                     <div class="widget-card info-widget border border-primary border-2 p-5 rounded-3 text-white"
                         style="background: linear-gradient(to left, #02b2b0,#02c574); height: 100%;">
                         <div class="h2 text-shadow">Share Your Profile with Allied Professional</div>
-                        <p class="text-shadow">Lorem Ipsum is simply dummy text of the printing and typesetting
-                            industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                        <p class="text-shadow">Designed for users seeking specialized care from allied health professionals, this feature simplifies the process of finding and requesting services from experts like physiotherapists, dietitians, and occupational therapists. Users can explore profiles of allied health professionals, each identified by a unique ID, with information on their qualifications and areas of expertise. After selecting a professional based on their specific health needs, users can submit a service request by choosing the professional`s ID and providing relevant details about their health requirements.</p>
                         <a href="/shareProfile-allied-professional"
                             onclick="getDoctorslist(event)"class="btn btn-light px-4 py-2 text-primary shadow">Share
                             Now</a>
