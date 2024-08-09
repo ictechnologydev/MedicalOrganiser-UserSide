@@ -328,7 +328,11 @@
             value_list = field['comma_separated_values'];
 
             html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
-
+            
+            if(field['option'] == "by_whom")
+            {
+                html_field += `<option value=""  style="text-transform:capitalize;" > Selelct ${field['option'].replace(/_/g, ' ')}</option>`;
+            }
             for (var i = 0; i < value_list.length; i++) {
 
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();

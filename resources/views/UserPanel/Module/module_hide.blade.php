@@ -315,7 +315,6 @@ function create_field_html(field) {
 
     
     html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
-
     for (var i = 0; i < value_list.length; i++) {
         // Check if field['store_value'] matches the current option value
         var isSelected = field['store_value'] && field['store_value'].trim() == String(value_list[i]['value']).trim();

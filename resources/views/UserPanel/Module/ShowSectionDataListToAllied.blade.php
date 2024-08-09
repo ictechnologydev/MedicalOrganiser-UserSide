@@ -334,11 +334,14 @@ function create_field_html(field) {
             value_list = field['comma_separated_values'];
 
             html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
-
+            if(field['option'] == "by_whom")
+            {
+                html_field += `<option value=""  style="text-transform:capitalize;" > Selelct ${field['option'].replace(/_/g, ' ')}</option>`;
+            }
             for (var i = 0; i < value_list.length; i++) {
 
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-               
+                
                 html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ?  String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
