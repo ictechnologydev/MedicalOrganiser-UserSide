@@ -86,12 +86,8 @@
            
 
               <div class="mb-3">
-                <label for="title" class="form-label">Date</label>
-                <input type="date" class="form-control date"  name="date"placeholder="select date...">
-              </div>
-              <div class="mb-3">
-                <label for="images" class="form-label">Time</label>
-                <input type="time" class="form-control time"  name="time"placeholder="select Time...">
+                <label for="title" class="form-label">Date Time</label>
+                <input type="datetime-local" class="form-control date_time"  name="date_time"placeholder="select date time...">
               </div>
               <div class="mb-3">
                     <label for="title" class="form-label">By Whom</label>
@@ -152,12 +148,8 @@
                       </div>
                 </div>
                   <div class="mb-3">
-                    <label for="title" class="form-label">Date</label>
-                    <input type="date" class="form-control Edate" id="date" name="date"placeholder="select date...">
-                  </div>
-                  <div class="mb-3">
-                    <label for="images" class="form-label">Time</label>
-                    <input type="time" class="form-control Etime" id="time" name="time"placeholder="select Time...">
+                    <label for="title" class="form-label">Date Time</label>
+                    <input type="datetime-local" class="form-control Edate_time" id="date_time" name="date_time" placeholder="select date time...">
                   </div>
 
                   <div class="mb-3">
@@ -229,7 +221,7 @@ function convertTo24Time(time12) {
 
  function store_reminders() {
   
-    if($('.des').val()  =='' ||  $('.title').val()  =='' ||  $('.date').val() == '' ||  $('.time').val()  =='' ||  $('.alert_before').val()  =='' ||  $('#bywhom').val()  =='')
+    if($('.des').val()  == '' ||  $('.title').val()  == '' ||  $('.date_time').val() == '' ||  $('.alert_before').val()  == '' ||  $('#bywhom').val()  == '')
     {
         toastr.error("All fields are required");
         return 0;
@@ -247,10 +239,9 @@ function convertTo24Time(time12) {
 
             "des": $('.des').val(),
             "title": $('.title').val(),
-            "date": $('.date').val(),
+            "date_time": $('.date_time').val(),
             "bywhom": $('#bywhom').val(),
             "alert_before": $('.alert_before').val(),
-            "time": convertToAMPM($('.time').val()),
             "status": 1,
             "web": 1,
             "user_id": getCookie('user_id'),
@@ -433,22 +424,12 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
 
 
 
-                const time = document.createElement('div');
-                time.className = 'text-secondary my-1';
-                time.style.color = '#B9B4C7';
-                time.style.fontStyle = 'none';
-                time.style.fontWeight = '100';
-                time.innerHTML = `<strong><small style="color:black;font-weight:bold">Time :</small>${update.time}</strong>`;
-                innerDiv.appendChild(time);
-
-
-
                 const date = document.createElement('div');
                 date.className = 'text-secondary my-1';
                 date.style.color = '#B9B4C7';
                 date.style.fontStyle = 'none';
                 date.style.fontWeight = '100';
-                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date :</small>${convertDateFormat__(update.date)}</strong>`;
+                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date Time:</small>${update.date_time}</strong>`;
                 innerDiv.appendChild(date);
 
                 const responseElement = document.createElement('div');
@@ -666,8 +647,7 @@ function editReminder(updateId) {
             $('.Edes').val(reminder.des);
             $('#Ebywhom').val(reminder.bywhom);
             $('.Ealert_before').val(reminder.alert_before);
-            $('.Etime').val(convertTo24Time(reminder.time));
-            $('.Edate').val(convertDateFormat(reminder.date));
+            $('.Edate_time').val(reminder.date_time);
             $('#reminderUpdate').modal('show');
             loader(false);
         },error: function(response) {
@@ -705,10 +685,9 @@ var formData = {
         "id": $('.Eid').val(),
         "des": $('.Edes').val(),
         "title": $('.Etitle').val(),
-        "date": $('.Edate').val(),
+        "date_time": $('.Edate_time').val(),
         "alert_before": $('.Ealert_before').val(),
         "bywhom": $('#Ebywhom').val(),
-        "time": convertToAMPM($('.Etime').val())
     };
     loader(true);
     $.ajax({
@@ -747,7 +726,6 @@ function fetchAcceptedDoctorAndAllied() {
         },
         type: "POST",
         url: `{{config('app.api_url')}}/api/users/fetch-accepted-doctor-and-allied`,
-        // contentType: "application/json",
         data: { 'patient_id' : getCookie('user_id')},
         success: function(response) {
             var my_doctor_and_allied = response.data.my_doctor_and_allied;
@@ -756,7 +734,7 @@ function fetchAcceptedDoctorAndAllied() {
             var html =`<option value="">Select By Whom Doctor / Allied Professional</option>`;
             for(var i = 0; i< my_doctor_and_allied.length; i++)
             {
-              html +=`<option value="${my_doctor_and_allied[i].email}" >${my_doctor_and_allied[i]?.role?.name} : ${my_doctor_and_allied[i].email}</option>`;
+              html +=`<option value="${my_doctor_and_allied[i].email}" >${my_doctor_and_allied[i]?.role?.name} : ${my_doctor_and_allied[i].user_name}</option>`;
             }
 
             $('.bywhom').html(html);
