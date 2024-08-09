@@ -764,7 +764,7 @@ function add_data(_this, id) {
                         __check = 0;
                         __div = 0;
                     }
-                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}" >`;
                 html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
                 if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {
