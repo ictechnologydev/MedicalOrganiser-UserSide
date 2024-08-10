@@ -66,6 +66,7 @@
                             <th>Sr</th>
                             <th>Allied Professional Id</th>
                             <th>Email</th>
+                            <th>Name</th>
                             <th>Send Date</th>
                             <th>Accepted Date</th>
                             <th>Action</th>
@@ -263,19 +264,21 @@
         <td>${i+1}</td>
 
         <td>${request_to_allied_profess[i].allied_professional_id}</td>
-
-        <td>${request_to_allied_profess[i].user_data.email}</td>`;
+        
+        <td>${request_to_allied_profess[i].user_data.email}</td>
+        <td>${request_to_allied_profess[i]?.user_data?.single_name_only ?  request_to_allied_profess[i]?.user_data?.single_name_only : ''}</td>
+        `;
 
                         userMeta = request_to_allied_profess[i].user_data.userMeta ? request_to_allied_profess[i].user_data.userMeta : [];
                         var obj = {
-                            "doctor_id_number" : "",
+                            "single_name_only" : "",
                             // "full_name" : "",
                         }
                         for(j=0; j< userMeta.length;j++)
                         {
-                            if(userMeta[j]?.option == 'doctor_id_number'){
+                            if(userMeta[j]?.option == 'single_name_only'){
 
-                                obj.doctor_id_number = userMeta[j]?.value
+                                obj.single_name_only = userMeta[j]?.value
 
                             }
                             // if(userMeta[j]?.option == 'full_name'){
