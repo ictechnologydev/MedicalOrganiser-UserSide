@@ -430,7 +430,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 date.style.color = '#B9B4C7';
                 date.style.fontStyle = 'none';
                 date.style.fontWeight = '100';
-                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date Time:</small>${update.date_time}</strong>`;
+                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date Time:</small>${normal_format(update.date_time)}</strong>`;
                 innerDiv.appendChild(date);
 
                 const responseElement = document.createElement('div');
@@ -779,6 +779,32 @@ new DataTable('#example');
 $("#medicine-select-field,#recurring-select-field,#doctor-select-field").select2({
     theme: "bootstrap-5",
 });
+
+function normal_format(inputDateStr) {
+    // Create a Date object from the input string
+    const date = new Date(inputDateStr);
+
+    // Define options for formatting the date
+    const options = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true // Use 12-hour format
+    };
+
+    // Format the date
+    let formattedDate = date.toLocaleString('en-GB', options);
+
+    // Convert 'dd/mm/yyyy hh:mm' to 'dd-mm-yyyy hh:mm AM/PM'
+    formattedDate = formattedDate
+        .replace(',', '') // Remove the comma
+        .replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2-$1-$3') // Change from 'dd/mm/yyyy' to 'dd-mm-yyyy'
+        .replace(/(\d{2}):(\d{2}) ([APM]{2})/, '$1:$2 $3'); // Ensure correct AM/PM format
+
+    return formattedDate;
+}
 
 
 </script>
