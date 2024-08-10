@@ -140,24 +140,23 @@ var reminders  =  response.data.reminders;
 
 
 
-for(var i=0; i< reminders.length; i++)
-{
-  if(reminders[i].status == 1){
+// for(var i=0; i< reminders.length; i++)
+// {
+//   if(reminders[i].status == 1){
 
-    alarm_list[i] = {
-      "alarm_time"  : `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`,
-      "remind_me_before" :  `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`,
-      "title" : reminders[i].title,
-      "des"   : reminders[i].des
-    } 
+//     alarm_list[i] = {
+//       "alarm_time"  : `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`,
+//       "remind_me_before" :  `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`,
+//       "title" : reminders[i].title,
+//       "des"   : reminders[i].des
+//     } 
 
-    alarm_time[i] = `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`;
-    remind_me_before[i] = `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`;
+//     alarm_time[i] = `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`;
+//     remind_me_before[i] = `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`;
 
 
-    console.log(convertDateFormat_(reminders[i].date),convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before)))
-  }
-}
+//   }
+// }
 
 setInterval(function() {
   alarm(alarm_list, alarm_time,remind_me_before);

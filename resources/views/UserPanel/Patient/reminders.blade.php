@@ -242,6 +242,7 @@ function convertTo24Time(time12) {
             "date_time": $('.date_time').val(),
             "bywhom": $('#bywhom').val(),
             "alert_before": $('.alert_before').val(),
+            "timeZone" : Intl.DateTimeFormat().resolvedOptions().timeZone,
             "status": 1,
             "web": 1,
             "user_id": getCookie('user_id'),
@@ -374,7 +375,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
             "Authorization": `Bearer ${getCookie('BearerToken')}`,
         },
         type: "GET",
-        url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&from=${from}`,
+        url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&from=${from}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
         success: function(response) {
             console.log(response);
             const requestUpdates = response.data.reminders;
@@ -535,7 +536,7 @@ function checkReminders(requestUpdates) {
             "Authorization": `Bearer ${getCookie('BearerToken')}`,
         },
         type: "GET",
-        url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}`,
+        url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
         success: function(response) {
             console.log(response.data, 'support');
             const requestUpdates = response.data.reminders;
@@ -584,7 +585,7 @@ function update_status(button) {
             "Authorization": `Bearer ${getCookie('BearerToken')}`,
         },
         type: "PUT",
-        url: `{{config('app.api_url')}}/api/reminders/${updateId}/update-status?status=${newStatus}`,
+        url: `{{config('app.api_url')}}/api/reminders/${updateId}/update-status?status=${newStatus}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
 
         success: function(response) {
             console.log(response.message);
@@ -638,7 +639,7 @@ function editReminder(updateId) {
         },
         type: "GET",
 
-        url: `{{config('app.api_url')}}/api/reminders/${updateId}/edit`,
+        url: `{{config('app.api_url')}}/api/reminders/${updateId}/edit?timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
 
         success: function(response) {
             var  reminder = response.data.reminder;
@@ -688,6 +689,7 @@ var formData = {
         "date_time": $('.Edate_time').val(),
         "alert_before": $('.Ealert_before').val(),
         "bywhom": $('#Ebywhom').val(),
+        "timeZone" : Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
     loader(true);
     $.ajax({
@@ -696,7 +698,7 @@ var formData = {
             "Authorization": `Bearer ${getCookie('BearerToken')}`,
         },
         type: "PUT",
-        url: `{{config('app.api_url')}}/api/reminders/${formData.id}?des=${formData.des}&date=${formData.date}&title=${formData.title}&time=${formData.time}`,
+        url: `{{config('app.api_url')}}/api/reminders/${formData.id}?des=${formData.des}&date_time=${formData.date_time}&title=${formData.title}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
         data: formData,
         success: function(response) {
             $('#reminderUpdate').modal('hide');
