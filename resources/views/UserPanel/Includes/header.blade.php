@@ -486,6 +486,9 @@ $("a.dropdown-item").hide();
             $("#profileid,#appSupportid").show();
         } else if (role_id == 3) {
             $("#profileid, #socialHistoryFormid, #HealthSummaryid,#myRequestsid, #remindersid, #appSupportid,#ManageHistoryid").show();
+        } else if(role_id == 17)
+        {
+          $("#profileid,#appSupportid").show();
         }
 
 });
