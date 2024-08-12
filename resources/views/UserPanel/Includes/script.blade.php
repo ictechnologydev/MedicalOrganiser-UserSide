@@ -66,6 +66,16 @@ const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`;
 return formattedDateTime;
 }
 
+function getCurrentDateTimeUTC() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 function getCurrentDate() {
   const now = new Date();
   const year = now.getFullYear();
@@ -78,26 +88,15 @@ function getCurrentDate() {
   return formattedDateTime;
 }
 
+
 function alarm(alarm_list,alarm_time,remind_me_before) {
-   
-    var index = alarm_time.findIndex((element) => element == getCurrentDateTime());
-    var index2 = remind_me_before.findIndex((element) => element == getCurrentDateTime());
+  var index = alarm_time.findIndex((element) => element == getCurrentDateTimeUTC());
     
-    if (index !== -1) {
-    
-      sound.play();
-      $('#alarm_modal').modal('show');
-      $('.alarm_title').html(alarm_list[index].title);
-      $('.alarm_description').html(alarm_list[index].des);
-    }
-
-
-    if (index2 !== -1) {
-    
+  if (index !== -1) {  
     sound.play();
     $('#alarm_modal').modal('show');
-    $('.alarm_title').html(alarm_list[index2].title);
-    $('.alarm_description').html(alarm_list[index2].des);
+    $('.alarm_title').html(alarm_list[index].title);
+    $('.alarm_description').html(alarm_list[index].des);
   }
     
 }
@@ -128,42 +127,37 @@ var alarm_list = [];
 var alarm_time = [];
 var remind_me_before = [];
 
-$.ajax({
-headers: {
-"Accept": "application/json",
-"Authorization": `Bearer ${getCookie('BearerToken')}`,
-},
-type: "GET",
-url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}`,
-success: function(response) {
-var reminders  =  response.data.reminders;
+  $.ajax({
+  headers: {
+  "Accept": "application/json",
+  "Authorization": `Bearer ${getCookie('BearerToken')}`,
+  },
+  type: "GET",
+  url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
+  success: function(response) {
+  var reminders  =  response.data.reminders;
 
+  for(var i=0; i< reminders.length; i++)
+  {
+    if(reminders[i].status == 1){
 
+      alarm_list[i] = {
+        "alarm_time"  : reminders[i].date_time,
+        "title"       : reminders[i].title,
+        "des"         : reminders[i].des
+      } 
 
-// for(var i=0; i< reminders.length; i++)
-// {
-//   if(reminders[i].status == 1){
+      alarm_time[i] = `${reminders[i].date_time}`;
 
-//     alarm_list[i] = {
-//       "alarm_time"  : `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`,
-//       "remind_me_before" :  `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`,
-//       "title" : reminders[i].title,
-//       "des"   : reminders[i].des
-//     } 
+    }
+  }
 
-//     alarm_time[i] = `${convertDateFormat_(reminders[i].date)} ${convertTo24Time_(reminders[i].time)}`;
-//     remind_me_before[i] = `${convertDateFormat_(subtractDays(reminders[i].date,reminders[i].alert_before))} ${convertTo24Time_(reminders[i].time)}`;
+  setInterval(function() {
+    alarm(alarm_list, alarm_time,remind_me_before);
+  }, 58000);
 
-
-//   }
-// }
-
-setInterval(function() {
-  alarm(alarm_list, alarm_time,remind_me_before);
-}, 58000);
-
-}
-});
+  }
+  });
 }
 
 function convertTo24Time_(time12) {
@@ -1148,7 +1142,6 @@ function getprofile(user_id,role_id){
             },
                     error: function(response) {
                       
-                     console.log(response.responseJSON.data);
                       loader(false);
                       if (response.status == 422) {
                       var errors = response.responseJSON.data;

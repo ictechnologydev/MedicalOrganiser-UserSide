@@ -221,7 +221,7 @@ function convertTo24Time(time12) {
 
  function store_reminders() {
   
-    if($('.des').val()  == '' ||  $('.title').val()  == '' ||  $('.date_time').val() == '' ||  $('.alert_before').val()  == '' ||  $('#bywhom').val()  == '')
+    if($('.des').val()  == '' ||  $('.title').val()  == '' ||  $('.date_time').val() == '' ||  $('#bywhom').val()  == '')
     {
         toastr.error("All fields are required");
         return 0;
@@ -241,7 +241,7 @@ function convertTo24Time(time12) {
             "title": $('.title').val(),
             "date_time": $('.date_time').val(),
             "bywhom": $('#bywhom').val(),
-            "alert_before": $('.alert_before').val(),
+            "alert_before": $('.alert_before').val() ? $('.alert_before').val() : '',
             "timeZone" : Intl.DateTimeFormat().resolvedOptions().timeZone,
             "status": 1,
             "web": 1,
@@ -351,7 +351,6 @@ function checkAndTriggerAlarms(requestUpdates) {
         const reminderTime = new Date(update.date + ' ' + update.time);
         if (currentTime.getTime() >= reminderTime.getTime() && update.status === 1) {
             alarmTriggered = true;
-            console.log('Alarm triggered for:', update.title);
         }
     });
 
@@ -368,7 +367,6 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
     container.empty();
     const from = (page - 1) * perPage;
     
-    console.log(from,'test');
     $.ajax({
         headers: {
             "Accept": "application/json",
@@ -377,7 +375,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
         type: "GET",
         url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&from=${from}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
         success: function(response) {
-            console.log(response);
+
             const requestUpdates = response.data.reminders;
             
             
@@ -394,7 +392,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 title.style.color = '#B9B4C7';
                 title.style.fontStyle = 'none';
                 title.style.fontWeight = '100';
-                title.innerHTML = `<strong><small style="color:black;font-weight:bold">Title :</small>${update.title}</strong>`;
+                title.innerHTML = `<strong><small style="color:black;font-weight:bold">Title :</small> ${update.title}</strong>`;
                 innerDiv.appendChild(title);
 
 
@@ -403,7 +401,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 descriptionElement.style.color = '#B9B4C7';
                 descriptionElement.style.fontStyle = 'none';
                 descriptionElement.style.fontWeight = '100';
-                descriptionElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Additional Notes :</small>${update.des}</strong>`;
+                descriptionElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Additional Notes :</small> ${update.des}</strong>`;
                 innerDiv.appendChild(descriptionElement);
 
                 const ByWhomElement = document.createElement('div');
@@ -411,7 +409,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 ByWhomElement.style.color = '#B9B4C7';
                 ByWhomElement.style.fontStyle = 'none';
                 ByWhomElement.style.fontWeight = '100';
-                ByWhomElement.innerHTML = `<strong><small style="color:black;font-weight:bold">By Whom :</small>${update.bywhom}</strong>`;
+                ByWhomElement.innerHTML = `<strong><small style="color:black;font-weight:bold">By Whom :</small> ${update.bywhom}</strong>`;
                 innerDiv.appendChild(ByWhomElement);
 
 
@@ -420,7 +418,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 AdditionalNotesElement.style.color = '#B9B4C7';
                 AdditionalNotesElement.style.fontStyle = 'none';
                 AdditionalNotesElement.style.fontWeight = '100';
-                AdditionalNotesElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Remind Me Before :</small>${update.alert_before ? update.alert_before :  "-" }</strong>`;
+                AdditionalNotesElement.innerHTML = `<strong><small style="color:black;font-weight:bold">Remind Me Before :</small> ${update.alert_before ? update.alert_before :  " -" }</strong>`;
                 innerDiv.appendChild(AdditionalNotesElement);
 
 
@@ -430,7 +428,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 date.style.color = '#B9B4C7';
                 date.style.fontStyle = 'none';
                 date.style.fontWeight = '100';
-                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date Time:</small>${normal_format(update.date_time)}</strong>`;
+                date.innerHTML = `<strong><small style="color:black;font-weight:bold">Date Time:</small> ${normal_format(update.date_time)}</strong>`;
                 innerDiv.appendChild(date);
 
                 const responseElement = document.createElement('div');
@@ -481,7 +479,7 @@ function get_all_reminders(user_id, calendarTime, page = 1) {
                 return;
             }
 
-console.log(response.recordsFiltered, page,'test')
+
             updatePaginationButton(response.recordsFiltered, page);
             loader(false);
         },
@@ -494,14 +492,11 @@ console.log(response.recordsFiltered, page,'test')
 function updatePaginationButton(count, currentPage) {
     loader(false);
     count = Math.ceil(count);
-    console.log(count, currentPage);
+   
     var pages_btn = ``;
 
     const prevPage = currentPage - 1 >= 1 ? currentPage - 1 : 1;
     const nextPage = currentPage + 1 <= Math.ceil(count / 10) ? currentPage + 1 : Math.ceil(count / 10);
-
-    console.log("Current page value:", currentPage);
-    console.log("Next page value:", nextPage);
 
     pages_btn += `<button type="button" class="btn btn-outline-primary btn-sm" onclick="get_all_reminders(getCookie('user_id'), ${prevPage});">Previous</button>`;
 
@@ -538,7 +533,6 @@ function checkReminders(requestUpdates) {
         type: "GET",
         url: `{{config('app.api_url')}}/api/reminders?user_id=${getCookie('user_id')}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
         success: function(response) {
-            console.log(response.data, 'support');
             const requestUpdates = response.data.reminders;
             const currentTime = new Date();
             const currentHours = currentTime.getHours();
@@ -552,7 +546,6 @@ function checkReminders(requestUpdates) {
 
                 if (reminderHours === currentHours && reminderMinutes === currentMinutes) {
 
-                    console.log(`Reminder match found for ${update.title}`);
                 }
             });
         }
@@ -588,13 +581,13 @@ function update_status(button) {
         url: `{{config('app.api_url')}}/api/reminders/${updateId}/update-status?status=${newStatus}&timeZone=${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
 
         success: function(response) {
-            console.log(response.message);
+        
 
             location.reload();
             loader(false);
         },
         error: function(response) {
-            console.log(response.error)
+
             loader(false);
 
         }
@@ -616,13 +609,13 @@ function delete_reminders(button) {
         url: `{{config('app.api_url')}}/api/reminders/${updateId}`,
 
         success: function(response) {
-            console.log(response.message);
+        
 
             location.reload();
             loader(false);
         },
         error: function(response) {
-            console.log(response.error)
+      
             loader(false);
 
         }
@@ -706,7 +699,6 @@ var formData = {
             get_all_reminders();
         },
         error: function(response) {
-            console.log(response.error)
             loader(false);
 
         }
