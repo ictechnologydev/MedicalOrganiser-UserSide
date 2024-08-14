@@ -140,7 +140,7 @@
         
               <th>Email</th>
         
-              <th>Doctor Id Number</th>
+              <th>Name</th>
         
               <!--<th>Full Name</th>-->
         
@@ -649,7 +649,7 @@
         
         var obj = {
         
-        "doctor_id_number" : "",
+        "first_name" : "",
         
         // "full_name" : "",
         
@@ -665,9 +665,9 @@
         
         
         
-        if(userMeta[j]?.option == 'doctor_id_number'){
+        if(userMeta[j]?.option == 'first_name'){
         
-        obj.doctor_id_number = userMeta[j]?.value
+        obj.first_name = userMeta[j]?.value
         
         }
         
@@ -685,7 +685,7 @@
         
         html +=`
         
-        <td>${obj.doctor_id_number}</td>
+        <td>${obj.first_name}</td>
         
     
         
@@ -1207,6 +1207,7 @@ if (html.trim() === '') {
         var idCell = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
         var emailCell = row.querySelector('td:nth-child(3)').textContent.trim();
         var nameCell = row.querySelector('td:nth-child(4)').textContent.trim();
+        
         var idMatches = idCell === searchText;
         var emailMatches = emailCell.includes(searchText);
         
