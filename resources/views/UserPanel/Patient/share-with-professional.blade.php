@@ -542,9 +542,10 @@
                 doctorRows.forEach(function (row) {
                     var idCell = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
                     var emailCell = row.querySelector('td:nth-child(3)').textContent.trim().toLowerCase();
+                    var nameCell = row.querySelector('td:nth-child(4)').textContent.trim();
                     var idMatches = idCell === searchText;
                     var emailMatches = emailCell.includes(searchText);
-                    if (idMatches || emailMatches) {
+                    if (idMatches || emailMatches || nameCell.includes(searchText)) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
