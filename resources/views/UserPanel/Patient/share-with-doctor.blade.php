@@ -1206,12 +1206,7 @@ if (html.trim() === '') {
         doctorRows.forEach(function (row) {
         var idCell = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
         var emailCell = row.querySelector('td:nth-child(3)').textContent.trim();
-<<<<<<< HEAD
-        var nameCell = row.querySelector('td:nth-child(3)').textContent.trim();
-        
-=======
         var nameCell = row.querySelector('td:nth-child(4)').textContent.trim();
->>>>>>> 1e3b6fa15e61f53d7a2be80b290f334107faa7d0
         var idMatches = idCell === searchText;
         var emailMatches = emailCell.includes(searchText);
         
