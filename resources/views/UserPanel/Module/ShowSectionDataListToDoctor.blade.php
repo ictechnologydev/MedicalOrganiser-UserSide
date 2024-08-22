@@ -275,7 +275,7 @@ $(document).ready(function() {
     fetch_all_data(getCookie('section_module_id'),getCookie('section_module_table'),'0','',getCookie('section_patient'));
 });
 
-function create_field_html(field) {
+function create_field_html(field, login_user) {
         var html_field = ``;
 
         if (field['type'] == 'text') {
@@ -334,13 +334,16 @@ function create_field_html(field) {
             value_list = field['comma_separated_values'];
 
             html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
-            if(field['option'] == "by_whom")
+            if(field['option'] == "by_whom" & login_user.role.name != "Doctor")
             {
                 html_field += `<option value=""  style="text-transform:capitalize;" > Selelct ${field['option'].replace(/_/g, ' ')}</option>`;
             }
             for (var i = 0; i < value_list.length; i++) {
-
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                if((login_user.role.name == "Doctor") && (value_list[i]['value'] == login_user.id) && (field['store_value'] === undefined)){
+                    var isSelected = true;
+                }else{
+                    var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                }
                
                 html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ?  String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
@@ -746,6 +749,7 @@ function add_data(_this, id) {
 
 
             var fields = response.data.module_manager.module_manager_meta;
+            var login_user = response.data.login_user;
 
             var html_field = ``;
 
@@ -780,7 +784,7 @@ function add_data(_this, id) {
                             commaSeparatedValues[j]['label'] = customLabel;
                         }
                     }
-                html_field += create_field_html(fields[i]);
+                html_field += create_field_html(fields[i], login_user);
                 html_field += `</div>`;
             }
             html_field += `
@@ -821,7 +825,7 @@ function add_data(_this, id) {
                     html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
                     html_fields +=
                         `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
-                    html_fields += create_field_html(editfields[i]);
+                    html_fields += create_field_html(editfields[i], login_user);
                     html_fields += `</div>`;
                 }
 

@@ -269,7 +269,7 @@
         fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'))
     });
 
-    function create_field_html(field) {
+    function create_field_html(field, login_user) {
         var html_field = ``;
 
         if (field['type'] == 'text') {
@@ -327,16 +327,25 @@
         if (field['type'] == 'dropdown') {
             value_list = field['comma_separated_values'];
 
-            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
+            html_field += `<select class="form-control"  id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
             
-            if(field['option'] == "by_whom")
+            if(field['option'] == "by_whom" & login_user.role.name != "Patient")
             {
                 html_field += `<option value=""  style="text-transform:capitalize;" > Selelct ${field['option'].replace(/_/g, ' ')}</option>`;
             }
             for (var i = 0; i < value_list.length; i++) {
+                var str = value_list[i]['label'];
+                var match = str.match(/\(([^)]+)\)/);  // Declare and initialize 'match' variable
 
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-               
+                if (match && match[1]) {  // Check if 'match' is not null and 'match[1]' exists
+                    var valueInsideParentheses = match[1];  // Safely extract the value inside the parentheses
+                }
+                
+                if((login_user.role.name == "Patient") && (valueInsideParentheses == "patient@medicalorganiser.com") && (field['store_value'] === undefined)){
+                    var isSelected = true;
+                }else{
+                    var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                }
                 html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ?  String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
@@ -755,7 +764,7 @@
 
 
                 var fields = response.data.module_manager.module_manager_meta;
-
+                var login_user = response.data.login_user;
 
                 var html_field = ``;
 
@@ -791,7 +800,7 @@
                         }
                     }
 
-                    html_field += create_field_html(fields[i]);
+                    html_field += create_field_html(fields[i], login_user);
                     html_field += `</div>`;
                    
                 }
@@ -830,7 +839,7 @@
                     html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
                     html_fields +=
                         `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
-                    html_fields += create_field_html(editfields[i]);
+                    html_fields += create_field_html(editfields[i], login_user);
                     html_fields += `</div>`;
                 }
 
@@ -940,6 +949,9 @@
     thead th,
     tfoot th {
         text-transform: capitalize !important;
+    }
+    .select2.select2-container.select2-container--default {
+        text-transform: lowercase !important;
     }
 </style>
 @include('UserPanel.Includes.footer')
