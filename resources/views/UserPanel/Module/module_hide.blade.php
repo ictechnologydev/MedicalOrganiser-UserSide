@@ -311,27 +311,36 @@ function create_field_html(field) {
         }
     } else
     if (field['type'] == 'dropdown') {
-    value_list = field['comma_separated_values']
-
+        value_list = field['comma_separated_values']
     
-    html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
-    for (var i = 0; i < value_list.length; i++) {
-        // Check if field['store_value'] matches the current option value
-        var isSelected = field['store_value'] && field['store_value'].trim() == String(value_list[i]['value']).trim();
+        html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+        for (var i = 0; i < value_list.length; i++) {
+            // Check if field['store_value'] matches the current option value
+            var isSelected = field['store_value'] && field['store_value'].trim() == String(value_list[i]['value']).trim();
 
-        html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
-    }
+            html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+        }
 
-    html_field += `</select>`;
-}
- else
-    if (field['type'] == 'textarea') {
+        html_field += `</select>`;
+    } else if (field['type'] == 'multi_layer_inline_dropdown') {
+        value_list = field['comma_separated_values']
+        
+        html_field += `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+        for (var i = 0; i < value_list.length; i++) {
+            // Check if field['store_value'] matches the current option value
+            var isSelected = field['store_value'] && field['store_value'].trim() == String(value_list[i]['value']).trim();
+
+            html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+        }
+
+        html_field += `</select>`;
+    } else if (field['type'] == 'textarea') {
         html_field += `
         <textarea class="form-control" id="${field['option']}" name="${field['option']}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
         `;
     }
 
-    return html_field;
+        return html_field;
 }
 
 function show_data(id, table_name) {
