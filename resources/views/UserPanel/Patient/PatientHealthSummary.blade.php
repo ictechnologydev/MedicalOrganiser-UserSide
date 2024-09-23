@@ -153,9 +153,13 @@ function getPatientHealthSummary(user_id,role_id){
 
             success: function(response) {
 
+              console.log(response);
              var health_summary =   response.data.health_summary;
+
              var _meta =  response.data.health_summary_meta_data;
             
+
+
              var html = ``;
              for(let key in health_summary)
              {

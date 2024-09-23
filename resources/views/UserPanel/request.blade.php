@@ -7,8 +7,8 @@
     <div class="container-fluid p-3 main-container-content">
         <div class="row w-100 justify-content-between border border-3 border-primary border-top-0 border-bottom-0 border-end-0 ps-2 ms-0 mb-3">
             <div class="col-7">
-                <h3 class="p-0 m-0 bread-crumb-heading">Medical Request</h3>
-                <small>Dashabord - Medical Requests</small>
+                <h3 class="p-0 m-0 bread-crumb-heading">Add Data Request</h3>
+                <small>Dashabord - Add Data Request</small>
 
 
             </div>
