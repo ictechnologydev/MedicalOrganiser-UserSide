@@ -134,7 +134,7 @@
         
           <tr>
         
-              <th>Sr</th>
+              <!-- <th>Sr</th> -->
         
               <th>Doctor Id</th>
         
@@ -637,7 +637,7 @@
         //  if (request_to_doctor[i].patient_accept_or_reject == 1 && request_to_doctor[i].doctor_accept_or_reject == 0 || request_to_doctor[i].patient_accept_or_reject == 1 && request_to_doctor[i].doctor_accept_or_reject == 1) {
         html +=`<tr>
         
-        <td>${i+1}</td>
+       
         
         <td>${request_to_doctor[i].doctor_id}</td>
         
@@ -651,7 +651,7 @@
         
         "first_name" : "",
         
-        // "full_name" : "",
+         "sur_name": ""
         
         
         
@@ -670,6 +670,9 @@
         obj.first_name = userMeta[j]?.value
         
         }
+        if (userMeta[j]?.option === 'sur_name') {
+            obj.sur_name = userMeta[j]?.value;
+        }
         
         // if(userMeta[j]?.option == 'full_name'){
         
@@ -685,7 +688,7 @@
         
         html +=`
         
-        <td>${obj.first_name}</td>
+        <td>${obj.first_name} ${obj.sur_name}</td>
         
     
         

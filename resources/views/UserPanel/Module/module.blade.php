@@ -762,7 +762,7 @@
             url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
             success: function(response) { 
 
-
+               console.log(response.data.module_manager);
                 var fields = response.data.module_manager.module_manager_meta;
                 var login_user = response.data.login_user;
 

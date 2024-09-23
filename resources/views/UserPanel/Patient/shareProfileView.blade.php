@@ -80,7 +80,7 @@
 
                   <tr>
 
-                      <th>Sr</th>
+                      <!-- <th>Sr</th> -->
 
                       <th>Doctor Id</th>
 
@@ -261,7 +261,7 @@ function getDoctorslist(from, pagination) {
             var searchQuery = $("#search-query").val();
 
             var filteredDoctors = request_to_doctor.filter(function (doctor) {
-              return doctor.id.toString() === searchQuery || doctor.email == searchQuery;
+              return doctor.id.toString() === searchQuery || doctor.email.toLowerCase().includes(searchQuery);
             });
 
             var html = '';
@@ -302,7 +302,7 @@ function getDoctorslist(from, pagination) {
                 }
 
               html += `<tr>
-                <td>${i + 1}</td>
+                
                 <td>${filteredDoctors[i].id}</td>
                 <td>${filteredDoctors[i].email}</td>`;
 

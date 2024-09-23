@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME'),
     
-    'api_url' => "https://www.admin.medicalorganiser.com.au",
+    'api_url' => "http://127.0.0.1:8000",
 
     /*
     |--------------------------------------------------------------------------

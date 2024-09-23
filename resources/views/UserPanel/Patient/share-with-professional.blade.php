@@ -1,7 +1,3 @@
-
-
-
-
 @include('UserPanel.Includes.header')
 
 <div>
@@ -63,8 +59,8 @@
                         <thead style="background-color: #02b2b0;color:white">
                         <tr>
 
-                            <th>Sr</th>
-                            <th>Allied Professional Id</th>
+                            <!-- <th>Sr</th> -->
+                            <th> Id</th>
                             <th>Email</th>
                             <th>Name</th>
                             <th>Send Date</th>
@@ -261,7 +257,7 @@
                         var year = dateObj.getFullYear();
                         //  if (request_to_allied_profess[i].patient_accept_or_reject == 1 && request_to_allied_profess[i].doctor_accept_or_reject == 0 || request_to_allied_profess[i].patient_accept_or_reject == 1 && request_to_allied_profess[i].doctor_accept_or_reject == 1) {
                         html +=`<tr>
-        <td>${i+1}</td>
+       
 
         <td>${request_to_allied_profess[i].allied_professional_id}</td>
         
@@ -269,28 +265,25 @@
         
         `;
 
-                        userMeta = request_to_allied_profess[i].user_data.userMeta ? request_to_allied_profess[i].user_data.userMeta : [];
-                        var obj = {
-                            "single_name_only" : "",
-                            // "full_name" : "",
-                        }
-                        for(j=0; j< userMeta.length;j++)
-                        {
-                            if(userMeta[j]?.option == 'single_name_only'){
+     // Fetch `single_name_only` and `sur_name` from userMeta
+    var userMeta = request_to_allied_profess[i].user_data.userMeta ? request_to_allied_profess[i].user_data.userMeta : [];
+    var obj = {
+        "single_name_only": "",
+        "sur_name": ""
+    };
 
-                                obj.single_name_only = userMeta[j]?.value
+    for (j = 0; j < userMeta.length; j++) {
+        if (userMeta[j]?.option === 'single_name_only') {
+            obj.single_name_only = userMeta[j]?.value;
+        }
+        if (userMeta[j]?.option === 'sur_name') {
+            obj.sur_name = userMeta[j]?.value;
+        }
+    }
 
-                            }
-                            // if(userMeta[j]?.option == 'full_name'){
-                            // obj.full_name = userMeta[j]?.value
-                            // }
-                        }
-                        html +=`
-
-  
-
-
-<td>${obj.single_name_only}</td>
+    // Combine sur_name and single_name_only in one <td> (sur_name first, then single name)
+    html += `
+        <td> ${obj.single_name_only} ${obj.sur_name}</td>
         <td>${day < 10 ? '0' + day : day}-${month}-${year}</td>
 
 

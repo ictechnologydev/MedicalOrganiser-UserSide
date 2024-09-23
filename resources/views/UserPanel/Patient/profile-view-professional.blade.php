@@ -70,10 +70,10 @@
                     <table id="doctor-list2"class="table table-bordered">
                         <thead style="background-color: #02b2b0;color:white">
                         <tr>
-                            <th>Sr</th>
-                            <th>Allied Propessional Id</th>
+                            <!-- <th>Sr</th> -->
+                            <th>Id</th>
                             <th>Email</th>
-                            <th>Allied professional Id Number</th>
+                            <th style="width: 400px;">Allied professional Id Number</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -191,12 +191,16 @@
                     success: function (response) {
                         var request_to_allied_profess1 = response.data.request_to_allied_profess;
                         console.log(request_to_allied_profess1);
+
+                        // Set up the search button functionality
                         $("#search-button").on("click", function searchDoctors() {
                             var searchQuery = $("#search-query").val().trim().toLowerCase();
                             if (searchQuery === "") {
                                 $('#doctor-list-body2').html('<tr><td colspan="6">No records found</td></tr>');
                                 return;
                             }
+
+                            // Perform the search request
                             $.ajax({
                                 headers: {
                                     "Accept": "application/json",
@@ -205,76 +209,77 @@
                                 type: "GET",
                                 url: `{{config('app.api_url')}}/api/users/request-to-allied-professional?patient_id=${getCookie('user_id')}`,
                                 success: function (response) {
+                                    console.log(response.data);
                                     var request_to_allied_perfessional = response.data;
-                                    console.log(request_to_allied_perfessional)
-                                    var searchQuery = $("#search-query").val();
+                                    console.log(request_to_allied_perfessional);
 
+                                    // Apply filtering for partial email match or exact ID match
                                     var filterAlliedProfessional = request_to_allied_perfessional.filter(function (doctor) {
-                                    return doctor.id.toString() === searchQuery || doctor.email == searchQuery
-                                    })
+                                        return doctor.id.toString() === searchQuery || doctor.email.toLowerCase().includes(searchQuery);
+                                    });
 
-                                    console.log(request_to_allied_perfessional)
+                                    // Display results
                                     var html = '';
                                     var userMeta = '';
                                     if (filterAlliedProfessional.length === 0) {
                                         $('#doctor-list-body2').html('<tr><td colspan="6">No records found</td></tr>');
                                         return;
                                     }
+
+                                    // Iterate over filtered professionals and generate HTML
                                     for (var i = 0; i < filterAlliedProfessional.length; i++) {
                                         var matchingRequest = request_to_allied_profess1.find(reqDoc => reqDoc.doctor_id == filterAlliedProfessional[i].id);
+
+                                        // Set the button label and class based on the request status
+                                        var buttonLabel = 'Share';
+                                        var buttonClass = 'btn btn-primary btn-sm share-button';
+
                                         if (matchingRequest) {
                                             if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 2) {
                                                 buttonLabel = 'Share';
                                                 buttonClass = 'btn btn-primary btn-sm share-button';
-                                            }else if(matchingRequest.patient_accept_or_reject == 0 || matchingRequest.patient_accept_or_reject == 2){
-                                                var buttonLabel = 'Share';
-                                                var buttonClass = 'btn btn-primary btn-sm share-button';
+                                            } else if (matchingRequest.patient_accept_or_reject == 0 || matchingRequest.patient_accept_or_reject == 2) {
+                                                buttonLabel = 'Share';
+                                                buttonClass = 'btn btn-primary btn-sm share-button';
+                                            } else if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 0) {
+                                                buttonLabel = 'Pending';
+                                                buttonClass = 'btn btn-warning btn-sm';
+                                            } else if (matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 1) {
+                                                buttonLabel = 'Accepted';
+                                                buttonClass = 'btn btn-success btn-sm';
+                                            } else if (matchingRequest.patient_accept_or_reject == 2 && matchingRequest.doctor_accept_or_reject == 1) {
+                                                buttonLabel = 'Share';
+                                                buttonClass = 'btn btn-primary btn-sm share-button';
                                             }
-                                            else if(matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 0){
-                                                var buttonLabel = 'Pending';
-                                                var buttonClass = 'btn btn-warning btn-sm';
-                                            }
-                                            else if(matchingRequest.patient_accept_or_reject == 1 && matchingRequest.doctor_accept_or_reject == 1){
-                                                var buttonLabel = 'Accepted';
-                                                var buttonClass = 'btn btn-success btn-sm ';
-                                            }
-                                            else if(matchingRequest.patient_accept_or_reject == 2 && matchingRequest.doctor_accept_or_reject == 1){
-                                                var buttonLabel = 'Share';
-                                                var buttonClass = 'btn btn-primary btn-sm share-button';
-                                            }
-                                        }else{
-                                            var buttonLabel = 'Share';
-                                            var buttonClass = 'btn btn-primary btn-sm share-button';
                                         }
-                                        html += `<tr>
-                <td>${i + 1}</td>
-                <td>${filterAlliedProfessional[i].id}</td>
-                <td>${filterAlliedProfessional[i].email}</td>`;
-                                        profile = filterAlliedProfessional[i].profile ? filterAlliedProfessional[i].profile : [];
 
+                                        html += `<tr>
+                                            <td>${filterAlliedProfessional[i].id}</td>
+                                            <td>${filterAlliedProfessional[i].email}</td>`;
+
+                                        // Extract user profile data
+                                        profile = filterAlliedProfessional[i].profile ? filterAlliedProfessional[i].profile : [];
                                         var obj = {
                                             "doctor_id_number": "",
-                                            // "full_name": "",
                                         };
 
                                         for (var j = 0; j < profile.length; j++) {
                                             if (profile[j]?.option == 'doctor_id_number') {
                                                 obj.doctor_id_number = profile[j]?.value;
                                             }
-                                            // if (profile[j]?.option == 'full_name') {
-                                            //   obj.full_name = profile[j]?.value;
-                                            // }
                                         }
 
                                         html += `
-                <td>${obj.doctor_id_number}</td>
+                                            <td>${obj.doctor_id_number}</td>
+                                            <td><a class="${buttonClass}" data-id="${filterAlliedProfessional[i].id}" data-email="${filterAlliedProfessional[i].email}">${buttonLabel}</a></td>
+                                        </tr>`;
 
-                <td><a class="${buttonClass}" data-id="${filterAlliedProfessional[i].id}" data-email="${filterAlliedProfessional[i].email}">${buttonLabel}</a></td>
-              </tr>`;
                                         if (matchingRequest) {
                                             console.log("Matching Request Data:", matchingRequest);
                                         }
                                     }
+
+                                    // Append the search results to the table
                                     $('#doctor-list-body2').html(html);
                                 },
                             });
@@ -282,6 +287,7 @@
                     },
                 });
             }
+
             $(document).on('click', '.share-button', function() {
 
                 var alliedId = $(this).data('id');
