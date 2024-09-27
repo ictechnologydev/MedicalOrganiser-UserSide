@@ -520,7 +520,7 @@ $("a.dropdown-item").hide();
       <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
           <li><a id="appSupportid" class="dropdown-item" role="button" href="{{url('/AppSupport')}}">App Support</a></li>
           <a class="dropdown-item" id="ManageHistoryid" role="button" href="/manage-history" >Chronicle</a>
-        <li><a id="myRequestsid" class="dropdown-item" href="{{url('/requests')}}">Medical Request</a></li>
+        <li><a id="myRequestsid" class="dropdown-item" href="{{url('/requests')}}">Add Data Request</a></li>
         <a class="dropdown-item" id="HealthSummaryid" role="button" href="/patient-health-summary" >Health Summary</a>
         <a class="dropdown-item" id="socialHistoryFormid" role="button"  onclick="getSocialHistoryForm('${getCooki(\'user_id\')}', '${getCooki(\'role_id\')}');">Personal History</a>
         
