@@ -175,13 +175,15 @@ function getPatientHealthSummary(user_id,role_id){
              var _meta =  response.data.health_summary_meta_data;
             
              var html = ``;
+            /////////////// ADD BELOW LINE AFTER THIS "<div style="width:98%;text-align: center;">${key.replace(/_/g, ' ')}</div>" /////////////////////////
+            //  <div><button class="btn btn-secondary btn-sm ml-4" style="font-size:10px;margin-bottom:3px;" onclick="open_section_data_list_page_allied(${_meta[key]['id']},'${_meta[key]['name']}','${_meta[key]['table_name']}');" >view</button></div>
              for(let key in health_summary)
              {
                  html += `
                         <div class="row box">
                             <div class="box_head d-flex">
                                 <div style="width:98%;text-align: center;">${key.replace(/_/g, ' ')}</div>
-                                <div><button class="btn btn-secondary btn-sm ml-4" style="font-size:10px;margin-bottom:3px;" onclick="open_section_data_list_page_allied(${_meta[key]['id']},'${_meta[key]['name']}','${_meta[key]['table_name']}');" >view</button></div>
+
                             </div>
                             <div class="box_body">
                                 ${health_summary[key] !="" ? health_summary[key] : "<div class='text-center'>no data yet</div>" }
