@@ -350,8 +350,7 @@
             }
 
             html_field += `</select>`;
-        } 
-        else
+        } else
         if (field['type'] == 'multi_layer_inline_dropdown') {
             value_list = field['comma_separated_values'];
 
@@ -369,9 +368,7 @@
             }
 
             html_field += `</select>`;
-        }
-        
-        else if (field['type'] == 'multiselect') {
+        } else if (field['type'] == 'multiselect') {
             value_list = field['comma_separated_values'];
 
             // html_field += `<div class="form-group">`;
@@ -539,7 +536,7 @@
     module_name(getParams('name'));
 
     function submitData(event) {
-
+        console.log('submit');
         event.preventDefault();
 
         loader(true);
@@ -617,7 +614,7 @@
                 //id = id;
 
                 data = response.data.module_manager.module_manager_meta;
-                
+
                 add_data(data, id);
 
                 loader(false);
@@ -767,21 +764,18 @@
                 var login_user = response.data.login_user;
 
                 var html_field = ``;
-
                 var __check = 0;
                 var __div = 0;
 
                 for (i = 0; i < fields.length; i++) {
-                    
-                if(fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
-                {
-                    html_field += `<div class="d-flex" >`;
-                    __check = 1;
-                    __div = 1;
-                }
 
-                if(fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1)
-                    {
+                    if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
+                        html_field += `<div class="d-flex" >`;
+                        __check = 1;
+                        __div = 1;
+                    }
+
+                    if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
                         html_field += `</div>`;
                         __check = 0;
                         __div = 0;
@@ -789,30 +783,50 @@
                     html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}  " >`;
                     html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
+                    html_field +=
+                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                    html_field +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+
+                    // Handle specific case for schedule
                     if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {
                         let commaSeparatedValues = fields[i]['comma_separated_values'];
                         for (let j = 0; j < commaSeparatedValues.length; j++) {
-                            // Construct the custom label
                             let customLabel =
                                 `Schedule  :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
-                            // Update the label in the comma_separated_values object
                             commaSeparatedValues[j]['label'] = customLabel;
                         }
                     }
 
                     html_field += create_field_html(fields[i], login_user);
                     html_field += `</div>`;
-                   
+
+                    // Check for module_meta_dependencies and match with module_meta_id
+                    if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
+                        0) {
+                        for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
+                            if (fields[i].id == fields[i].module_meta_dependencies[dep].module_meta_id) {
+                                let dependencyField = fields[i].module_meta_dependencies[dep];
+
+                                html_field +=
+                                    `<div class="mb-3">
+                                        <label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
+                                html_field += create_field_html(dependencyField);
+                                html_field += `</div>`;
+                            }
+                        }
+                    }
                 }
+
                 html_field += `
-        <input type="hidden" name="table_name" value="${getParams('tb')}" />
-        <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
-        <input type="hidden" name="show__to" value="" />
-        <input type="hidden" name="module__id" value="${getParams('m_id')}" />
-        <input type="hidden" name="del" value="0" />
-        <input type="hidden" name="_Verify_" value="0" />
-        <input type="hidden" name="hide__or__show" value="1" />
-        <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
+            <input type="hidden" name="table_name" value="${getParams('tb')}" />
+            <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
+            <input type="hidden" name="show__to" value="" />
+            <input type="hidden" name="module__id" value="${getParams('m_id')}" />
+            <input type="hidden" name="del" value="0" />
+            <input type="hidden" name="_Verify_" value="0" />
+            <input type="hidden" name="hide__or__show" value="1" />
+            <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
 
                 $('.append_fields').html(html_field);
 
@@ -867,14 +881,8 @@
 
 
                 loader(false);
-
                 $('.threeDotLoder-edit').hide();
                 $('.threeDotLoder').hide();
-
-
-
-
-
             },
             error: function(response) {
                 loader(false);
@@ -891,7 +899,6 @@
                 }
             }
         });
-
     }
 
 
