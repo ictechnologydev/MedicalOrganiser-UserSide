@@ -335,19 +335,25 @@
             }
             for (var i = 0; i < value_list.length; i++) {
                 var str = value_list[i]['label'];
-                var match = str.match(/\(([^)]+)\)/);  // Declare and initialize 'match' variable
+                // Check if 'str' is defined and is a string before using 'match'
+                var match = (str && typeof str === 'string') ? str.match(/\(([^)]+)\)/) : null;
 
-                if (match && match[1]) {  // Check if 'match' is not null and 'match[1]' exists
-                    var valueInsideParentheses = match[1];  // Safely extract the value inside the parentheses
+                var valueInsideParentheses = null;
+                if (match && match[1]) {
+                    valueInsideParentheses = match[1]; // Safely extract the value inside the parentheses
                 }
-                
-                if((login_user.role.name == "Patient") && (valueInsideParentheses == "patient@medicalorganiser.com") && (field['store_value'] === undefined)){
-                    var isSelected = true;
-                }else{
-                    var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+
+                // Ensure 'login_user' and 'login_user.role' are defined, or handle accordingly
+                var isSelected = false;
+                if (login_user && login_user.role && login_user.role.name == "Patient" && valueInsideParentheses == "patient@medicalorganiser.com" && (field['store_value'] === undefined)) {
+                    isSelected = true;
+                } else {
+                    isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
                 }
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ?  String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+
+                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
+
 
             html_field += `</select>`;
         } else
@@ -811,7 +817,7 @@
                                 html_field +=
                                     `<div class="mb-3">
                                         <label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
-                                html_field += create_field_html(dependencyField);
+                                html_field += create_field_html(dependencyField, login_user);
                                 html_field += `</div>`;
                             }
                         }
