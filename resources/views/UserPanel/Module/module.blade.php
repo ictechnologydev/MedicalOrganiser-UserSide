@@ -48,7 +48,8 @@
     .d-flex.mb-3 {
         width: 25% !important;
     }
-    .select2.select2-container.select2-container--default{
+
+    .select2.select2-container.select2-container--default {
         padding: 0px !important;
         height: auto !important;
     }
@@ -269,152 +270,136 @@
         fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'))
     });
 
-    function create_field_html(field, login_user) {
+    function create_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
+
+        // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
+        var fieldName = parentFieldName ? `${parentFieldName}_${field['option']}` : field['option'];
 
         if (field['type'] == 'text') {
             html_field += `
-        <input type="text" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-        `;
+            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
         }
         if (field['type'] == 'number') {
             html_field += `
-        <input type="number" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-        `;
+            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
         }
         if (field['type'] == 'email') {
             html_field += `
-        <input type="email" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-        `;
-        } else
+            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
         if (field['type'] == 'image') {
             html_field += `
-        <input type="file" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-        `;
-        } else
+            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
         if (field['type'] == 'datepicker') {
             html_field += `
-        <input type="date" class="form-control" id="${field['option']}" name="${field['option']}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
-        `;
-        } else
+            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
         if (field['type'] == 'radio') {
-            value_list = field['comma_separated_values']
+            var value_list = field['comma_separated_values'];
 
             for (var i = 0; i < value_list.length; i++) {
-
                 html_field += `
-        <div class="form-check">
-        <input class="form-check-input" type="radio" name="${field['option']}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] ? field['store_value'] : '' == value_list[i]['label'].trim() ? 'checked' : i=='0' ? 'checked' : '' } >
-        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-        </div>
-        `;
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
+                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+                </div>
+                `;
             }
-        } else
+        }
         if (field['type'] == 'checkbox') {
-            value_list = field['comma_separated_values']
+            var value_list = field['comma_separated_values'];
 
             for (var i = 0; i < value_list.length; i++) {
-
                 html_field += `
-        <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="${field['option']}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] ? field['store_value'] : '' == value_list[i]['label'].trim() ? 'checked' : '' }>
-        <label class="form-check-label" style="text-transform: capitalize;" >${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-        </div>
-        `;
-
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim()) ? 'checked' : '' }>
+                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+                </div>
+                `;
             }
-        } else
+        }
         if (field['type'] == 'dropdown') {
-            value_list = field['comma_separated_values'];
-
-            html_field += `<select class="form-control"  id="${field['option']}"  ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${field['option']}">`;
-            
-            if(field['option'] == "by_whom" & login_user.role.name != "Patient")
-            {
-                html_field += `<option value=""  style="text-transform:capitalize;" > Selelct ${field['option'].replace(/_/g, ' ')}</option>`;
-            }
-            for (var i = 0; i < value_list.length; i++) {
-                var str = value_list[i]['label'];
-                // Check if 'str' is defined and is a string before using 'match'
-                var match = (str && typeof str === 'string') ? str.match(/\(([^)]+)\)/) : null;
-
-                var valueInsideParentheses = null;
-                if (match && match[1]) {
-                    valueInsideParentheses = match[1]; // Safely extract the value inside the parentheses
-                }
-
-                // Ensure 'login_user' and 'login_user.role' are defined, or handle accordingly
-                var isSelected = false;
-                if (login_user && login_user.role && login_user.role.name == "Patient" && valueInsideParentheses == "patient@medicalorganiser.com" && (field['store_value'] === undefined)) {
-                    isSelected = true;
-                } else {
-                    isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                }
-
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
-            }
-
-
-            html_field += `</select>`;
-        } else
-        if (field['type'] == 'multi_layer_inline_dropdown') {
-            value_list = field['comma_separated_values'];
-
-
+            var value_list = field['comma_separated_values'];
 
             html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+                `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
+
+            if (field['option'] == "by_whom" && login_user.role.name != "Patient") {
+                html_field +=
+                    `<option value="" style="text-transform:capitalize;">Select ${field['option'].replace(/_/g, ' ')}</option>`;
+            }
 
             for (var i = 0; i < value_list.length; i++) {
+                var str = value_list[i]['label'];
+                var match = str ? str.match(/\(([^)]+)\)/) : null;
+                var valueInsideParentheses = match && match[1] ? match[1] : null;
 
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                var isSelected = login_user && login_user.role && login_user.role.name == "Patient" &&
+                    valueInsideParentheses == "patient@medicalorganiser.com" && (field['store_value'] === undefined) ?
+                    true :
+                    field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
 
                 html_field +=
                     `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
-        } else if (field['type'] == 'multiselect') {
-            value_list = field['comma_separated_values'];
+        }
+        if (field['type'] == 'multi_layer_inline_dropdown') {
+            var value_list = field['comma_separated_values'];
 
-            // html_field += `<div class="form-group">`;
-            html_field += `<select class="form-control" id="${field['option']}" name="${field['option']}" data-placeholder="Please  select values"  multiple>`;
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
 
             for (var i = 0; i < value_list.length; i++) {
-                var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
-
-                html_field += `
-        <option value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'selected' : ''}>
-            ${value_list[i]['label'].trim()}
-        </option>`;
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
-            // html_field += `</div>`;
-        } else
-        if (field['type'] == 'multi_label_dropdown') {
-            value_list = field['comma_separated_values'];
-
-
+        }
+        if (field['type'] == 'multiselect') {
+            var value_list = field['comma_separated_values'];
 
             html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${field['option']}" name="${field['option']}">`;
+                `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`;
 
             for (var i = 0; i < value_list.length; i++) {
+                var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+            }
 
+            html_field += `</select>`;
+        }
+        if (field['type'] == 'multi_label_dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+
+            for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-
                 html_field +=
                     `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
             }
 
             html_field += `</select>`;
-        } else
+        }
         if (field['type'] == 'textarea') {
             html_field += `
-        <textarea class="form-control" id="${field['option']}" name="${field['option']}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
-        `;
+            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
+            `;
         }
+
         return html_field;
     }
 
@@ -696,9 +681,8 @@
     }
 
 
-    function medicationOnChange()
-    {
-        
+    function medicationOnChange() {
+
         $(".showAtChange").removeClass("d-none")
     }
 
@@ -753,9 +737,9 @@
     }
 
     function add_data(_this, id) {
-
         $('.threeDotLoder-edit').show();
         $('.threeDotLoder').show();
+
         $.ajax({
             headers: {
                 "Accept": "application/json",
@@ -763,20 +747,18 @@
             },
             type: "GET",
             url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
-            success: function(response) { 
-
-               console.log(response.data.module_manager);
+            success: function(response) {
                 var fields = response.data.module_manager.module_manager_meta;
+                var tableName = response.data.module_manager.table_name;
                 var login_user = response.data.login_user;
-
+                console.log(fields);
                 var html_field = ``;
                 var __check = 0;
                 var __div = 0;
 
-                for (i = 0; i < fields.length; i++) {
-
+                for (let i = 0; i < fields.length; i++) {
                     if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
-                        html_field += `<div class="d-flex" >`;
+                        html_field += `<div class="d-flex">`;
                         __check = 1;
                         __div = 1;
                     }
@@ -786,42 +768,50 @@
                         __check = 0;
                         __div = 0;
                     }
-                    html_field += `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}  " >`;
-                    html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
+                    // Main field
                     html_field +=
-                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
                     html_field +=
                         `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
-                    // Handle specific case for schedule
-                    if (fields[i]['option'] === 'schedule' && fields[i]['comma_separated_values']) {
-                        let commaSeparatedValues = fields[i]['comma_separated_values'];
-                        for (let j = 0; j < commaSeparatedValues.length; j++) {
-                            let customLabel =
-                                `Schedule  :   ${commaSeparatedValues[j]['label'].replace(/_/g, ' ')}`;
-                            commaSeparatedValues[j]['label'] = customLabel;
-                        }
-                    }
+                    html_field += create_field_html(fields[i], login_user); // No parent name
 
-                    html_field += create_field_html(fields[i], login_user);
-                    html_field += `</div>`;
-
-                    // Check for module_meta_dependencies and match with module_meta_id
+                    // Handle dependent fields (module_meta_dependencies)
                     if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
                         0) {
                         for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
-                            if (fields[i].id == fields[i].module_meta_dependencies[dep].module_meta_id) {
-                                let dependencyField = fields[i].module_meta_dependencies[dep];
+                            let dependencyField = fields[i].module_meta_dependencies[dep];
 
-                                html_field +=
-                                    `<div class="mb-3">
-                                        <label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
-                                html_field += create_field_html(dependencyField, login_user);
-                                html_field += `</div>`;
+                            // Correctly concatenate parent and child field names
+                            let dependencyFieldNameWithTable =
+                                `${fields[i].option}_${dependencyField.option}`;
+
+                            html_field +=
+                                `<div class="mb-3">
+                            <label class="mb-1" style="text-transform:capitalize;">${dependencyField.option ? dependencyField.option.replace(/_/g, ' ') : ''}</label>`;
+
+                            // Handle selected values match logic
+                            const parentSelectedValues = fields[i].selected_values ? fields[i]
+                                .selected_values.split(',').map(val => val.trim()) : [];
+                            const depSelectedValues = dependencyField.selected_values ? dependencyField
+                                .selected_values.split(',').map(val => val.trim()) : [];
+
+                            if (parentSelectedValues.length > 0 && depSelectedValues.length > 0) {
+                                if (parentSelectedValues.some(val => depSelectedValues.includes(val))) {
+                                    html_field += create_field_html(dependencyField, login_user, fields[i]
+                                        .option); // Send parent's name
+                                }
+                            } else {
+                                html_field += create_field_html(dependencyField, login_user, fields[i]
+                                    .option); // Send parent's name
                             }
+
+                            html_field += `</div>`;
                         }
                     }
+
+                    html_field += `</div>`;
                 }
 
                 html_field += `
@@ -836,45 +826,6 @@
 
                 $('.append_fields').html(html_field);
 
-                var editfields = _this;
-
-
-                var html_fields = ``;
-                var __check = 0;
-                var __div = 0;
-                for (i = 0; i < editfields.length; i++) {
-                    if(editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
-                {
-                    html_fields += `<div class="d-flex" >`;
-                    __check = 1;
-                    __div = 1;
-                }
-
-                if(editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1)
-                    {
-                        html_fields += `</div>`;
-                        __check = 0;
-                        __div = 0;
-                    }
-                    html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
-                    html_fields +=
-                        `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
-                    html_fields += create_field_html(editfields[i], login_user);
-                    html_fields += `</div>`;
-                }
-
-
-                html_fields += `
-
-        <input type="hidden" name="table_name" value="${getParams('tb')}" />
-        <input type="hidden" name="id" class="edit_id" value="${id}" />
-        <input type="hidden" name="show__to" value="" />
-        <input type="hidden" name="module__id" value="${getParams('m_id')}" />
-        <input type="hidden" name="del" value="0" />
-        <input type="hidden" name="_Verify_" value="0" />
-        <input type="hidden" name="hide__or__show" value="1" />
-        <button type="submit" class="btn btn-primary" onclick="editData(event)">Update</button>`;
-                $('.append_field').html(html_fields);
                 if (!id) {
                     $('.offcanvas select').select2({
                         dropdownParent: $('.offcanvas')
@@ -885,7 +836,6 @@
                     });
                 }
 
-
                 loader(false);
                 $('.threeDotLoder-edit').hide();
                 $('.threeDotLoder').hide();
@@ -895,17 +845,23 @@
                 if (response.status == 422) {
                     var errors = response.responseJSON.data;
                     $.each(errors, function(field, messages) {
-                        error_msg = messages[0];
-                        toastr.error(error_msg);
+                        toastr.error(messages[0]);
                     });
                 } else if (response.status == 500) {
-                    toastr.error("Something went wrong")
+                    toastr.error("Something went wrong");
                 } else {
-                    toastr.error(response.responseJSON.message)
+                    toastr.error(response.responseJSON.message);
                 }
             }
         });
     }
+
+
+
+
+
+
+
 
 
     function verify_by(user_id) {
@@ -963,6 +919,7 @@
     tfoot th {
         text-transform: capitalize !important;
     }
+
     .select2.select2-container.select2-container--default {
         text-transform: lowercase !important;
     }
