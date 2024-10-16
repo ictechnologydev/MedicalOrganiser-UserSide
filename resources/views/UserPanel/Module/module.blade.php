@@ -534,7 +534,7 @@
 
         var formData = {};
 
-
+        // Collect data from Add form (off-canvas) if present
         $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
             var fieldName = $(this).attr('name');
             var fieldValue = $(this).val();
@@ -544,10 +544,25 @@
             } else {
                 formData[fieldName] = fieldValue;
             }
-
-
         });
 
+        // Collect data from Edit form (modal) if present
+        $('.append_field input, .append_field select, .append_field textarea').each(function() {
+            var fieldName = $(this).attr('name');
+            var fieldValue = $(this).val();
+
+            if ($(this).attr('type') == 'date') {
+                formData[fieldName] = formatDate(fieldValue);
+            } else {
+                formData[fieldName] = fieldValue;
+            }
+        });
+
+        var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
+        if ($('.edit_id').val()) {
+            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Change URL for update if editing
+            formData['id'] = $('.edit_id').val(); // Add ID for editing
+        }
 
         $.ajax({
             headers: {
@@ -555,25 +570,33 @@
                 "Authorization": `Bearer ${getCookie('BearerToken')}`,
             },
             type: "POST",
-            url: "{{ config('app.api_url') }}/api/section-data/insert",
+            url: apiUrl,
             data: JSON.stringify(formData),
-
             contentType: "application/json",
             success: function(response) {
+                if ($('.edit_id').val()) {
+                    toastr.success("Data updated successfully");
+                } else {
+                    toastr.success("Data inserted successfully");
+                }
 
-                toastr.success("Data inserted successfully");
-                $('.offcanvas').offcanvas('hide');
+                // Close the modal or off-canvas
+                if ($('.offcanvas').length) {
+                    $('.offcanvas').offcanvas('hide');
+                }
+                if ($('.edit').length) {
+                    $('#edit-model').modal('hide');
+                }
+
                 location.reload();
-                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'))
-
+                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
             },
             error: function(response) {
                 loader(false);
                 if (response.status == 422) {
                     var errors = response.responseJSON.data;
                     $.each(errors, function(field, messages) {
-                        error_msg = messages[0];
-                        toastr.error(error_msg);
+                        toastr.error(messages[0]);
                     });
                 } else if (response.status == 500) {
                     toastr.error("Something went wrong");
@@ -584,9 +607,11 @@
         });
     }
 
+
     function fetchAndEditSection(id, table_name, module_manager_id) {
 
-
+        // alart('fsda');
+        console.log('fsad');
         //add_data(id);
         $.ajax({
             headers: {
@@ -737,6 +762,7 @@
     }
 
     function add_data(_this, id) {
+        // Show loaders
         $('.threeDotLoder-edit').show();
         $('.threeDotLoder').show();
 
@@ -749,13 +775,12 @@
             url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
             success: function(response) {
                 var fields = response.data.module_manager.module_manager_meta;
-                var tableName = response.data.module_manager.table_name;
                 var login_user = response.data.login_user;
-                console.log(fields);
                 var html_field = ``;
                 var __check = 0;
                 var __div = 0;
 
+                // Loop through the fields and generate HTML
                 for (let i = 0; i < fields.length; i++) {
                     if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
                         html_field += `<div class="d-flex">`;
@@ -769,21 +794,20 @@
                         __div = 0;
                     }
 
-                    // Main field
+                    // Main field creation
                     html_field +=
                         `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
                     html_field +=
                         `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
-                    html_field += create_field_html(fields[i], login_user); // No parent name
+                    // Main field HTML
+                    html_field += create_field_html(fields[i], login_user);
 
                     // Handle dependent fields (module_meta_dependencies)
                     if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
                         0) {
                         for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
                             let dependencyField = fields[i].module_meta_dependencies[dep];
-
-                            // Correctly concatenate parent and child field names
                             let dependencyFieldNameWithTable =
                                 `${fields[i].option}_${dependencyField.option}`;
 
@@ -814,29 +838,43 @@
                     html_field += `</div>`;
                 }
 
+                // Add hidden fields for the form
                 html_field += `
-            <input type="hidden" name="table_name" value="${getParams('tb')}" />
-            <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
-            <input type="hidden" name="show__to" value="" />
-            <input type="hidden" name="module__id" value="${getParams('m_id')}" />
-            <input type="hidden" name="del" value="0" />
-            <input type="hidden" name="_Verify_" value="0" />
-            <input type="hidden" name="hide__or__show" value="1" />
-            <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
+                <input type="hidden" name="table_name" value="${getParams('tb')}" />
+                <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
+                <input type="hidden" name="module__id" value="${getParams('m_id')}" />
+                <input type="hidden" name="del" value="0" />
+                <input type="hidden" name="id" class="edit_id" value="${id}" />
+                <input type="hidden" name="_Verify_" value="0" />
+                <input type="hidden" name="hide__or__show" value="1" />
+                <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
 
-                $('.append_fields').html(html_field);
+                // Handle Add or Edit case
+                if (id) {
+                    // If an id is present, we're in Edit mode (modal)
+                    $('.append_field').html(html_field);
+                    // Change the submit button for editing
+                    $('.append_field button').text('Update');
+                    $('.append_field button').attr('onclick', 'editData(event)'); // Edit action
+                } else {
+                    // Otherwise, we're in Add mode (off-canvas)
+                    $('.append_fields').html(html_field);
+                }
 
+                // Initialize select2 dropdowns after rendering
                 if (!id) {
+                    // For off-canvas (Add mode)
                     $('.offcanvas select').select2({
                         dropdownParent: $('.offcanvas')
                     });
                 } else {
+                    // For modal (Edit mode)
                     $('.edit select').select2({
                         dropdownParent: $('.edit')
                     });
                 }
 
-                loader(false);
+                // Hide loaders after appending fields
                 $('.threeDotLoder-edit').hide();
                 $('.threeDotLoder').hide();
             },
