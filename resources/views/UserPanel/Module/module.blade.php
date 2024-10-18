@@ -559,9 +559,13 @@
         });
 
         var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
-        if ($('.edit_id').val()) {
-            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Change URL for update if editing
-            formData['id'] = $('.edit_id').val(); // Add ID for editing
+        var editId = formData['id']; // Capture the id from the form
+
+        // Check if `id` is explicitly "undefined" or missing (insert mode)
+        if (editId && editId !== "undefined") {
+            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
+        } else {
+            delete formData['id']; // Remove the undefined id from formData for insert
         }
 
         $.ajax({
@@ -780,7 +784,7 @@
                 var __check = 0;
                 var __div = 0;
 
-                // Loop through the fields and generate HTML
+                // Loop through the fields
                 for (let i = 0; i < fields.length; i++) {
                     if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
                         html_field += `<div class="d-flex">`;
@@ -811,25 +815,17 @@
                             let dependencyFieldNameWithTable =
                                 `${fields[i].option}_${dependencyField.option}`;
 
+                            // Initially hide dependent fields with selected_values
+                            let hideClass = dependencyField.selected_values && dependencyField
+                                .selected_values.length > 0 ? 'd-none' : '';
+
                             html_field +=
-                                `<div class="mb-3">
-                            <label class="mb-1" style="text-transform:capitalize;">${dependencyField.option ? dependencyField.option.replace(/_/g, ' ') : ''}</label>`;
+                                `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                            html_field +=
+                                `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
 
-                            // Handle selected values match logic
-                            const parentSelectedValues = fields[i].selected_values ? fields[i]
-                                .selected_values.split(',').map(val => val.trim()) : [];
-                            const depSelectedValues = dependencyField.selected_values ? dependencyField
-                                .selected_values.split(',').map(val => val.trim()) : [];
-
-                            if (parentSelectedValues.length > 0 && depSelectedValues.length > 0) {
-                                if (parentSelectedValues.some(val => depSelectedValues.includes(val))) {
-                                    html_field += create_field_html(dependencyField, login_user, fields[i]
-                                        .option); // Send parent's name
-                                }
-                            } else {
-                                html_field += create_field_html(dependencyField, login_user, fields[i]
-                                    .option); // Send parent's name
-                            }
+                            // Add the dependent field HTML
+                            html_field += create_field_html(dependencyField, login_user, fields[i].option);
 
                             html_field += `</div>`;
                         }
@@ -841,34 +837,31 @@
                 // Add hidden fields for the form
                 html_field += `
                 <input type="hidden" name="table_name" value="${getParams('tb')}" />
+                <input type="hidden" name="id" class="edit_id" value="${id}" />
                 <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
                 <input type="hidden" name="module__id" value="${getParams('m_id')}" />
                 <input type="hidden" name="del" value="0" />
-                <input type="hidden" name="id" class="edit_id" value="${id}" />
                 <input type="hidden" name="_Verify_" value="0" />
                 <input type="hidden" name="hide__or__show" value="1" />
                 <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
 
                 // Handle Add or Edit case
                 if (id) {
-                    // If an id is present, we're in Edit mode (modal)
+                    // Edit mode
                     $('.append_field').html(html_field);
-                    // Change the submit button for editing
                     $('.append_field button').text('Update');
-                    $('.append_field button').attr('onclick', 'editData(event)'); // Edit action
+                    $('.append_field button').attr('onclick', 'editData(event)');
                 } else {
-                    // Otherwise, we're in Add mode (off-canvas)
+                    // Add mode
                     $('.append_fields').html(html_field);
                 }
 
                 // Initialize select2 dropdowns after rendering
                 if (!id) {
-                    // For off-canvas (Add mode)
                     $('.offcanvas select').select2({
                         dropdownParent: $('.offcanvas')
                     });
                 } else {
-                    // For modal (Edit mode)
                     $('.edit select').select2({
                         dropdownParent: $('.edit')
                     });
@@ -877,6 +870,9 @@
                 // Hide loaders after appending fields
                 $('.threeDotLoder-edit').hide();
                 $('.threeDotLoder').hide();
+
+                // Handle the visibility of dependent fields based on the selection
+                handleFieldVisibility();
             },
             error: function(response) {
                 loader(false);
@@ -893,6 +889,48 @@
             }
         });
     }
+
+    // Function to handle showing/hiding of dependent fields
+    function handleFieldVisibility() {
+    $('select').on('change', function() {
+        var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+        var parentField = $(this).attr('name');
+
+        if (!Array.isArray(selectedValues)) {
+            // Convert single select value to an array for consistency
+            selectedValues = [selectedValues];
+        }
+
+        // Loop through dependent fields and show/hide based on selected values
+        $('.dependent-field').each(function() {
+            var parent = $(this).data('parent');
+            var selectedValuesForChild = $(this).data('selected-values'); // selected_values for the child
+
+            if (parent === parentField) {
+                // If there are selected values for the child (i.e., dependent field has conditions)
+                if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                    // Check if any of the selected values in parent match the selected_values of child
+                    var shouldShow = selectedValues.some(val => {
+                        return selectedValuesForChild.some(childVal => childVal.value == val);
+                    });
+
+                    if (shouldShow) {
+                        $(this).removeClass('d-none'); // Show child field if match found
+                    } else {
+                        $(this).addClass('d-none'); // Hide if no match found
+                    }
+                } else {
+                    // If no selected values for child, show the field by default
+                    $(this).removeClass('d-none');
+                }
+            }
+        });
+    });
+}
+
+
+
+
 
 
 
