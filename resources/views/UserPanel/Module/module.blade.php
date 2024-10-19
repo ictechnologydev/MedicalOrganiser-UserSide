@@ -274,55 +274,67 @@
         var html_field = ``;
 
         // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
-        var fieldName = parentFieldName ? `${parentFieldName}_${field['option']}` : field['option'];
+        var fieldName = parentFieldName ? `${parentFieldName}.${field['option']}` : field['option'];
 
         if (field['type'] == 'text') {
             html_field += `
-            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+        <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
         if (field['type'] == 'number') {
             html_field += `
-            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+        <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
         if (field['type'] == 'email') {
             html_field += `
-            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+        <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
         if (field['type'] == 'image') {
             html_field += `
-            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+        <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
         if (field['type'] == 'datepicker') {
             html_field += `
-            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+        <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
         if (field['type'] == 'radio') {
             var value_list = field['comma_separated_values'];
 
+            // Add default "Select value" option at the top
+            html_field += `<div class="form-check">
+            <input class="form-check-input" type="radio" name="${fieldName}" value="">
+            <label class="form-check-label">Select value</label>
+        </div>`;
+
             for (var i = 0; i < value_list.length; i++) {
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
-                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-                </div>
-                `;
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
+                <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+            </div>
+            `;
             }
         }
         if (field['type'] == 'checkbox') {
             var value_list = field['comma_separated_values'];
 
+            // Add default "Select value" option at the top
+            html_field += `<div class="form-check">
+            <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="">
+            <label class="form-check-label">Select value</label>
+        </div>`;
+
             for (var i = 0; i < value_list.length; i++) {
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim()) ? 'checked' : '' }>
-                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-                </div>
-                `;
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim()) ? 'checked' : '' }>
+                <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+            </div>
+            `;
             }
         }
         if (field['type'] == 'dropdown') {
@@ -331,21 +343,12 @@
             html_field +=
                 `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
 
-            if (field['option'] == "by_whom" && login_user.role.name != "Patient") {
-                html_field +=
-                    `<option value="" style="text-transform:capitalize;">Select ${field['option'].replace(/_/g, ' ')}</option>`;
-            }
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
 
             for (var i = 0; i < value_list.length; i++) {
-                var str = value_list[i]['label'];
-                var match = str ? str.match(/\(([^)]+)\)/) : null;
-                var valueInsideParentheses = match && match[1] ? match[1] : null;
-
-                var isSelected = login_user && login_user.role && login_user.role.name == "Patient" &&
-                    valueInsideParentheses == "patient@medicalorganiser.com" && (field['store_value'] === undefined) ?
-                    true :
-                    field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
                 html_field +=
                     `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
@@ -357,6 +360,10 @@
 
             html_field +=
                 `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
 
             for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
@@ -372,6 +379,9 @@
             html_field +=
                 `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`;
 
+            // Add default "Select value" option
+            html_field += `<option value="">Select value</option>`;
+
             for (var i = 0; i < value_list.length; i++) {
                 var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
                 html_field +=
@@ -386,6 +396,10 @@
             html_field +=
                 `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
 
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
+
             for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
                 html_field +=
@@ -396,12 +410,13 @@
         }
         if (field['type'] == 'textarea') {
             html_field += `
-            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
-            `;
+        <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
+        `;
         }
 
         return html_field;
     }
+
 
     function show_data(id, table_name) {
 
@@ -615,7 +630,6 @@
     function fetchAndEditSection(id, table_name, module_manager_id) {
 
         // alart('fsda');
-        console.log('fsad');
         //add_data(id);
         $.ajax({
             headers: {
@@ -890,43 +904,54 @@
         });
     }
 
+    function getCurrentDate() {
+        let today = new Date();
+        let day = String(today.getDate()).padStart(2, '0');
+        let month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        let year = today.getFullYear();
+
+        return `${year}-${month}-${day}`;
+    }
+
     // Function to handle showing/hiding of dependent fields
     function handleFieldVisibility() {
-    $('select').on('change', function() {
-        var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
-        var parentField = $(this).attr('name');
+        $('select').on('change', function() {
+            var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+            var parentField = $(this).attr('name');
 
-        if (!Array.isArray(selectedValues)) {
-            // Convert single select value to an array for consistency
-            selectedValues = [selectedValues];
-        }
-
-        // Loop through dependent fields and show/hide based on selected values
-        $('.dependent-field').each(function() {
-            var parent = $(this).data('parent');
-            var selectedValuesForChild = $(this).data('selected-values'); // selected_values for the child
-
-            if (parent === parentField) {
-                // If there are selected values for the child (i.e., dependent field has conditions)
-                if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                    // Check if any of the selected values in parent match the selected_values of child
-                    var shouldShow = selectedValues.some(val => {
-                        return selectedValuesForChild.some(childVal => childVal.value == val);
-                    });
-
-                    if (shouldShow) {
-                        $(this).removeClass('d-none'); // Show child field if match found
-                    } else {
-                        $(this).addClass('d-none'); // Hide if no match found
-                    }
-                } else {
-                    // If no selected values for child, show the field by default
-                    $(this).removeClass('d-none');
-                }
+            if (!Array.isArray(selectedValues)) {
+                // Convert single select value to an array for consistency
+                selectedValues = [selectedValues];
             }
+
+            // Loop through dependent fields and show/hide based on selected values
+            $('.dependent-field').each(function() {
+                var parent = $(this).data('parent');
+                var selectedValuesForChild = $(this).data(
+                'selected-values'); // selected_values for the child
+
+                if (parent === parentField) {
+                    // If there are selected values for the child (i.e., dependent field has conditions)
+                    if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                        // Check if any of the selected values in parent match the selected_values of child
+                        var shouldShow = selectedValues.some(val => {
+                            return selectedValuesForChild.some(childVal => childVal.value ==
+                                val);
+                        });
+
+                        if (shouldShow) {
+                            $(this).removeClass('d-none'); // Show child field if match found
+                        } else {
+                            $(this).addClass('d-none'); // Hide if no match found
+                        }
+                    } else {
+                        // If no selected values for child, show the field by default
+                        $(this).removeClass('d-none');
+                    }
+                }
+            });
         });
-    });
-}
+    }
 
 
 
