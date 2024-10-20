@@ -847,6 +847,33 @@
 
                     html_field += `</div>`;
                 }
+                            var editfields = _this;
+
+
+            var html_fields = ``;
+
+            var __check = 0;
+            var __div = 0;
+            for (i = 0; i < editfields.length; i++) {
+                if(editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0)
+            {
+                html_fields += `<div class="d-flex" >`;
+                __check = 1;
+                __div = 1;
+            }
+            if(editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1)
+                {
+                    html_fields += `</div>`;
+                    __check = 0;
+                    __div = 0;
+                }
+                html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}" >`;
+                html_fields +=
+                    `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
+                html_fields += create_field_html(editfields[i], login_user);
+                html_fields += `</div>`;
+            }
+            console.log(html_fields);
 
                 // Add hidden fields for the form
                 html_field += `
@@ -862,7 +889,7 @@
                 // Handle Add or Edit case
                 if (id) {
                     // Edit mode
-                    $('.append_field').html(html_field);
+                    $('.append_field').html(html_fields);
                     $('.append_field button').text('Update');
                     $('.append_field button').attr('onclick', 'editData(event)');
                 } else {
