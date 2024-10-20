@@ -199,7 +199,7 @@ function getPatientHealthSummary(user_id,role_id){
 
              //--
 
-             var fields =   response.data.social_history_form.fields;
+             var fields =   response.data.social_history_form;
 
 
 
