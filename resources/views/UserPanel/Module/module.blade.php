@@ -272,13 +272,20 @@
 
     function create_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
-
+        var value = '';
+        if (field['value']) {
+            value = field['value'];
+        } else if (field['store_value']) {
+            value = field['store_value'];
+        } else if (field['store_values'] && field['store_values'].length > 0) {
+            value = field['store_values'][0]['value'];
+        }
         // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
 
         if (field['type'] == 'text') {
             html_field += `
-            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ value }" placeholder="${capitalizeFirstLetter(field['option'])}">
             `;
         }
         if (field['type'] == 'number') {
@@ -847,9 +854,59 @@
 
                     html_field += `</div>`;
                 }
+                var editfields = _this;
+
+
+                var html_fields = '';
+                var __check = 0;
+                var __div = 0;
+                for (var i = 0; i < editfields.length; i++) {
+                    if (editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
+                        html_fields += `<div class="d-flex">`;
+                        __check = 1;
+                        __div = 1;
+                    }
+                    if (editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
+                        html_fields += `</div>`;
+                        __check = 0;
+                        __div = 0;
+                    }
+                    html_fields +=
+                        `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}">`;
+                    html_fields +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
+                    html_fields += create_field_html(editfields[i], login_user);
+
+                    // Handle child fields
+                    if (editfields[i]['module_meta_dependencies'] && editfields[i][
+                            'module_meta_dependencies'
+                        ].length > 0) {
+                        for (var j = 0; j < editfields[i]['module_meta_dependencies'].length; j++) {
+                            var childField = editfields[i]['module_meta_dependencies'][j];
+                            html_fields += `<div class="mb-3">`;
+                            html_fields +=
+                                `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
+                            html_fields += create_field_html(childField, login_user, editfields[i].option);
+                            html_fields += `</div>`;
+                        }
+                    }
+
+                    html_fields += `</div>`;
+                }
+                console.log(html_fields);
+
 
                 // Add hidden fields for the form
                 html_field += `
+                <input type="hidden" name="table_name" value="${getParams('tb')}" />
+                <input type="hidden" name="id" class="edit_id" value="${id}" />
+                <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
+                <input type="hidden" name="module__id" value="${getParams('m_id')}" />
+                <input type="hidden" name="del" value="0" />
+                <input type="hidden" name="_Verify_" value="0" />
+                <input type="hidden" name="hide__or__show" value="1" />
+                <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
+                html_fields += `
                 <input type="hidden" name="table_name" value="${getParams('tb')}" />
                 <input type="hidden" name="id" class="edit_id" value="${id}" />
                 <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
@@ -862,7 +919,7 @@
                 // Handle Add or Edit case
                 if (id) {
                     // Edit mode
-                    $('.append_field').html(html_field);
+                    $('.append_field').html(html_fields);
                     $('.append_field button').text('Update');
                     $('.append_field button').attr('onclick', 'editData(event)');
                 } else {
@@ -915,47 +972,49 @@
 
     // Function to handle showing/hiding of dependent fields
     function handleFieldVisibility() {
-    $('select').on('change', function() {
-        var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
-        var parentField = $(this).attr('name');
-        console.log(selectedValues, 'selectedValues');
-        console.log(parentField, 'parentField');
+        $('select').on('change', function() {
+            var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+            var parentField = $(this).attr('name');
+            console.log(selectedValues, 'selectedValues');
+            console.log(parentField, 'parentField');
 
-        if (!Array.isArray(selectedValues)) {
-            // Convert single select value to an array for consistency
-            selectedValues = [selectedValues];
-        }
-
-        // Loop through dependent fields and show/hide based on selected values
-        $('.dependent-field').each(function() {
-            var parent = $(this).data('parent');
-            var selectedValuesForChild = $(this).data('selected-values'); // selected_values for the child
-            console.log(selectedValuesForChild, 'child');
-            console.log(parent, 'parent');
-
-            if (parent === parentField) {
-                if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                    // Iterate through selected values and compare them with child values
-                    var shouldShow = selectedValues.some(function(val) {
-                        return selectedValuesForChild.some(function(childVal) {
-                            // Compare by string conversion to handle alphanumeric values
-                            return String(childVal.value).trim().toLowerCase() === String(val).trim().toLowerCase();
-                        });
-                    });
-
-                    if (shouldShow) {
-                        $(this).removeClass('d-none'); // Show child field if match found
-                    } else {
-                        $(this).addClass('d-none'); // Hide if no match found
-                    }
-                } else {
-                    // If no selected values for child, show the field by default
-                    $(this).removeClass('d-none');
-                }
+            if (!Array.isArray(selectedValues)) {
+                // Convert single select value to an array for consistency
+                selectedValues = [selectedValues];
             }
+
+            // Loop through dependent fields and show/hide based on selected values
+            $('.dependent-field').each(function() {
+                var parent = $(this).data('parent');
+                var selectedValuesForChild = $(this).data(
+                    'selected-values'); // selected_values for the child
+                console.log(selectedValuesForChild, 'child');
+                console.log(parent, 'parent');
+
+                if (parent === parentField) {
+                    if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                        // Iterate through selected values and compare them with child values
+                        var shouldShow = selectedValues.some(function(val) {
+                            return selectedValuesForChild.some(function(childVal) {
+                                // Compare by string conversion to handle alphanumeric values
+                                return String(childVal.value).trim().toLowerCase() ===
+                                    String(val).trim().toLowerCase();
+                            });
+                        });
+
+                        if (shouldShow) {
+                            $(this).removeClass('d-none'); // Show child field if match found
+                        } else {
+                            $(this).addClass('d-none'); // Hide if no match found
+                        }
+                    } else {
+                        // If no selected values for child, show the field by default
+                        $(this).removeClass('d-none');
+                    }
+                }
+            });
         });
-    });
-}
+    }
 
 
 
