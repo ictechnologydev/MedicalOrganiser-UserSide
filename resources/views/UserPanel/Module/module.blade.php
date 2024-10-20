@@ -915,43 +915,47 @@
 
     // Function to handle showing/hiding of dependent fields
     function handleFieldVisibility() {
-        $('select').on('change', function() {
-            var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
-            var parentField = $(this).attr('name');
+    $('select').on('change', function() {
+        var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+        var parentField = $(this).attr('name');
+        console.log(selectedValues, 'selectedValues');
+        console.log(parentField, 'parentField');
 
-            if (!Array.isArray(selectedValues)) {
-                // Convert single select value to an array for consistency
-                selectedValues = [selectedValues];
-            }
+        if (!Array.isArray(selectedValues)) {
+            // Convert single select value to an array for consistency
+            selectedValues = [selectedValues];
+        }
 
-            // Loop through dependent fields and show/hide based on selected values
-            $('.dependent-field').each(function() {
-                var parent = $(this).data('parent');
-                var selectedValuesForChild = $(this).data(
-                    'selected-values'); // selected_values for the child
+        // Loop through dependent fields and show/hide based on selected values
+        $('.dependent-field').each(function() {
+            var parent = $(this).data('parent');
+            var selectedValuesForChild = $(this).data('selected-values'); // selected_values for the child
+            console.log(selectedValuesForChild, 'child');
+            console.log(parent, 'parent');
 
-                if (parent === parentField) {
-                    // If there are selected values for the child (i.e., dependent field has conditions)
-                    if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                        // Check if any of the selected values in parent match the selected_values of child
-                        var shouldShow = selectedValues.some(val => {
-                            return selectedValuesForChild.some(childVal => childVal.value ==
-                                val);
+            if (parent === parentField) {
+                if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                    // Iterate through selected values and compare them with child values
+                    var shouldShow = selectedValues.some(function(val) {
+                        return selectedValuesForChild.some(function(childVal) {
+                            // Compare by string conversion to handle alphanumeric values
+                            return String(childVal.value).trim().toLowerCase() === String(val).trim().toLowerCase();
                         });
+                    });
 
-                        if (shouldShow) {
-                            $(this).removeClass('d-none'); // Show child field if match found
-                        } else {
-                            $(this).addClass('d-none'); // Hide if no match found
-                        }
+                    if (shouldShow) {
+                        $(this).removeClass('d-none'); // Show child field if match found
                     } else {
-                        // If no selected values for child, show the field by default
-                        $(this).removeClass('d-none');
+                        $(this).addClass('d-none'); // Hide if no match found
                     }
+                } else {
+                    // If no selected values for child, show the field by default
+                    $(this).removeClass('d-none');
                 }
-            });
+            }
         });
-    }
+    });
+}
 
 
 
