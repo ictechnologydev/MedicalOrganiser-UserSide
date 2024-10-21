@@ -270,6 +270,160 @@
         fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'))
     });
 
+    function edit_field_html(field, login_user, parentFieldName = null) {
+        var html_field = ``;
+        var value = '';
+        if (field['value']) {
+            value = field['value'];
+        } else if (field['store_value']) {
+            value = field['store_value'];
+        } else if (field['store_values'] && field['store_values'].length > 0) {
+            value = field['store_values'][0]['value'];
+        }
+        // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
+        var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
+
+        if (field['type'] == 'text') {
+            html_field += `
+            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ value }" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
+        if (field['type'] == 'number') {
+            html_field += `
+            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
+        if (field['type'] == 'email') {
+            html_field += `
+            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
+        if (field['type'] == 'image') {
+            html_field += `
+            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
+        if (field['type'] == 'datepicker') {
+            html_field += `
+            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            `;
+        }
+        if (field['type'] == 'radio') {
+            var value_list = field['comma_separated_values'];
+
+            for (var i = 0; i < value_list.length; i++) {
+                html_field += `
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
+            <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+        </div>
+        `;
+            }
+        }
+
+        if (field['type'] == 'checkbox') {
+            var value_list = field['comma_separated_values'];
+
+            for (var i = 0; i < value_list.length; i++) {
+                html_field += `
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim()) ? 'checked' : '' }>
+            <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+        </div>
+        `;
+            }
+        }
+        if (field['type'] == 'dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field +=
+                `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
+
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
+
+            for (var i = 0; i < value_list.length; i++) {
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+            }
+
+            html_field += `</select>`;
+        }
+        if (field['type'] == 'multi_layer_inline_dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
+
+            for (var i = 0; i < value_list.length; i++) {
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+            }
+
+            html_field += `</select>`;
+        }
+
+        if (field['type'] == 'multiselect') {
+            var value_list = field['comma_separated_values'];
+
+            html_field +=
+                `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`; // Added [] to name
+
+            // Add default "Select value" option
+            html_field += `<option value="">Select value</option>`;
+
+            // Parse 'store_value' into an array of selected values
+            var selectedValues = [];
+            if (field['store_value']) {
+                selectedValues = field['store_value'].split(',').map(function(item) {
+                    return item.trim();
+                });
+            }
+
+            for (var i = 0; i < value_list.length; i++) {
+                var optionValue = String(value_list[i]['value']).trim();
+                var isChecked = selectedValues.includes(optionValue); // Updated isChecked logic
+                html_field +=
+                    `<option value="${optionValue}" ${isChecked ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+            }
+
+            html_field += `</select>`;
+        }
+
+        if (field['type'] == 'multi_label_dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+
+            // Add default "Select value" option
+            html_field +=
+                `<option value="">Select value</option>`;
+
+            for (var i = 0; i < value_list.length; i++) {
+                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+            }
+
+            html_field += `</select>`;
+        }
+        if (field['type'] == 'textarea') {
+            html_field += `
+            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
+            `;
+        }
+
+        return html_field;
+    }
+
     function create_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
         var value = '';
@@ -311,39 +465,32 @@
         if (field['type'] == 'radio') {
             var value_list = field['comma_separated_values'];
 
-            // Add default "Select value" option at the top
-            html_field += `<div class="form-check">
-                <input class="form-check-input" type="radio" name="${fieldName}" value="">
-                <label class="form-check-label">Select value</label>
-            </div>`;
-
             for (var i = 0; i < value_list.length; i++) {
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
-                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-                </div>
-                `;
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] == value_list[i]['label'].trim() ? 'checked' : i == 0 ? 'checked' : '' }>
+            <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+        </div>
+        `;
             }
         }
+
         if (field['type'] == 'checkbox') {
             var value_list = field['comma_separated_values'];
-
-            // Add default "Select value" option at the top
-            html_field += `<div class="form-check">
-                <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="">
-                <label class="form-check-label">Select value</label>
-            </div>`;
+            var selected_values = field['store_value'] ? field['store_value'].split(',') : [];
 
             for (var i = 0; i < value_list.length; i++) {
+                var isChecked = selected_values.includes(String(value_list[i]['value']).trim());
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${String(value_list[i]['value']).trim()}" ${ field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim()) ? 'checked' : '' }>
-                    <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
-                </div>
-                `;
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+            </div>
+        `;
             }
         }
+
+
         if (field['type'] == 'dropdown') {
             var value_list = field['comma_separated_values'];
 
@@ -549,89 +696,105 @@
     module_name(getParams('name'));
 
     function submitData(event) {
-        console.log('submit');
-        event.preventDefault();
+    console.log('submit');
+    event.preventDefault();
 
-        loader(true);
+    loader(true);
 
-        var formData = {};
+    var formData = {};
 
-        // Collect data from Add form (off-canvas) if present
-        $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
-            var fieldName = $(this).attr('name');
-            var fieldValue = $(this).val();
+    // Collect data from Add form (off-canvas) if present
+    $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
+        var fieldName = $(this).attr('name');
+        var fieldValue = $(this).val();
 
-            if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
-            } else {
-                formData[fieldName] = fieldValue;
+        if ($(this).attr('type') == 'checkbox') {
+            // Initialize an array for checkbox values if it doesn't exist
+            if (!formData[fieldName]) {
+                formData[fieldName] = [];
             }
-        });
-
-        // Collect data from Edit form (modal) if present
-        $('.append_field input, .append_field select, .append_field textarea').each(function() {
-            var fieldName = $(this).attr('name');
-            var fieldValue = $(this).val();
-
-            if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
-            } else {
-                formData[fieldName] = fieldValue;
+            if ($(this).is(':checked')) {
+                formData[fieldName].push($(this).val()); // Push checked value to the array
             }
-        });
-
-        var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
-        var editId = formData['id']; // Capture the id from the form
-
-        // Check if `id` is explicitly "undefined" or missing (insert mode)
-        if (editId && editId !== "undefined") {
-            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
+        } else if ($(this).attr('type') == 'date') {
+            formData[fieldName] = formatDate(fieldValue);
         } else {
-            delete formData['id']; // Remove the undefined id from formData for insert
+            formData[fieldName] = fieldValue;
         }
+    });
 
-        $.ajax({
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${getCookie('BearerToken')}`,
-            },
-            type: "POST",
-            url: apiUrl,
-            data: JSON.stringify(formData),
-            contentType: "application/json",
-            success: function(response) {
-                if ($('.edit_id').val()) {
-                    toastr.success("Data updated successfully");
-                } else {
-                    toastr.success("Data inserted successfully");
-                }
+    // Collect data from Edit form (modal) if present
+    $('.append_field input, .append_field select, .append_field textarea').each(function() {
+        var fieldName = $(this).attr('name');
+        var fieldValue = $(this).val();
 
-                // Close the modal or off-canvas
-                if ($('.offcanvas').length) {
-                    $('.offcanvas').offcanvas('hide');
-                }
-                if ($('.edit').length) {
-                    $('#edit-model').modal('hide');
-                }
-
-                location.reload();
-                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
-            },
-            error: function(response) {
-                loader(false);
-                if (response.status == 422) {
-                    var errors = response.responseJSON.data;
-                    $.each(errors, function(field, messages) {
-                        toastr.error(messages[0]);
-                    });
-                } else if (response.status == 500) {
-                    toastr.error("Something went wrong");
-                } else {
-                    toastr.error(response.responseJSON.message);
-                }
+        if ($(this).attr('type') == 'checkbox') {
+            // Initialize an array for checkbox values if it doesn't exist
+            if (!formData[fieldName]) {
+                formData[fieldName] = [];
             }
-        });
+            if ($(this).is(':checked')) {
+                formData[fieldName].push($(this).val()); // Push checked value to the array
+            }
+        } else if ($(this).attr('type') == 'date') {
+            formData[fieldName] = formatDate(fieldValue);
+        } else {
+            formData[fieldName] = fieldValue;
+        }
+    });
+
+    var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
+    var editId = formData['id']; // Capture the id from the form
+
+    // Check if `id` is explicitly "undefined" or missing (insert mode)
+    if (editId && editId !== "undefined") {
+        apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
+    } else {
+        delete formData['id']; // Remove the undefined id from formData for insert
     }
+
+    $.ajax({
+        headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${getCookie('BearerToken')}`,
+        },
+        type: "POST",
+        url: apiUrl,
+        data: JSON.stringify(formData),
+        contentType: "application/json",
+        success: function(response) {
+            if ($('.edit_id').val()) {
+                toastr.success("Data updated successfully");
+            } else {
+                toastr.success("Data inserted successfully");
+            }
+
+            // Close the modal or off-canvas
+            if ($('.offcanvas').length) {
+                $('.offcanvas').offcanvas('hide');
+            }
+            if ($('.edit').length) {
+                $('#edit-model').modal('hide');
+            }
+
+            location.reload();
+            fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
+        },
+        error: function(response) {
+            loader(false);
+            if (response.status == 422) {
+                var errors = response.responseJSON.data;
+                $.each(errors, function(field, messages) {
+                    toastr.error(messages[0]);
+                });
+            } else if (response.status == 500) {
+                toastr.error("Something went wrong");
+            } else {
+                toastr.error(response.responseJSON.message);
+            }
+        }
+    });
+}
 
 
     function fetchAndEditSection(id, table_name, module_manager_id) {
@@ -875,7 +1038,7 @@
                         `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}">`;
                     html_fields +=
                         `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
-                    html_fields += create_field_html(editfields[i], login_user);
+                    html_fields += edit_field_html(editfields[i], login_user);
 
                     // Handle child fields
                     if (editfields[i]['module_meta_dependencies'] && editfields[i][
@@ -886,7 +1049,7 @@
                             html_fields += `<div class="mb-3">`;
                             html_fields +=
                                 `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
-                            html_fields += create_field_html(childField, login_user, editfields[i].option);
+                            html_fields += edit_field_html(childField, login_user, editfields[i].option);
                             html_fields += `</div>`;
                         }
                     }
@@ -972,8 +1135,19 @@
 
     // Function to handle showing/hiding of dependent fields
     function handleFieldVisibility() {
-        $('select').on('change', function() {
-            var selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+        // Listen for changes on both select and checkbox inputs
+        $('select, input[type="checkbox"]').on('change', function() {
+            var selectedValues = [];
+
+            if ($(this).is('select')) {
+                selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+            } else if ($(this).is('input[type="checkbox"]')) {
+                // Collect checked values if it's a checkbox
+                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
+                    selectedValues.push($(this).val());
+                });
+            }
+
             var parentField = $(this).attr('name');
             console.log(selectedValues, 'selectedValues');
             console.log(parentField, 'parentField');
