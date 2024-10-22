@@ -361,7 +361,6 @@
         `;
             }
         }
-
         if (field['type'] == 'dropdown') {
             var value_list = field['comma_separated_values'];
 
@@ -516,6 +515,23 @@
         `;
             }
         }
+
+        if (field['type'] == 'checkbox') {
+            var value_list = field['comma_separated_values'];
+            var selected_values = field['store_value'] ? field['store_value'].split(',') : [];
+
+            for (var i = 0; i < value_list.length; i++) {
+                var isChecked = selected_values.includes(String(value_list[i]['value']).trim());
+                html_field += `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="${fieldName}" value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label" style="text-transform: capitalize;">${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</label>
+            </div>
+        `;
+            }
+        }
+
+
         if (field['type'] == 'dropdown') {
             var value_list = field['comma_separated_values'];
 
@@ -721,89 +737,105 @@
     module_name(getParams('name'));
 
     function submitData(event) {
-        console.log('submit');
-        event.preventDefault();
+    console.log('submit');
+    event.preventDefault();
 
-        loader(true);
+    loader(true);
 
-        var formData = {};
+    var formData = {};
 
-        // Collect data from Add form (off-canvas) if present
-        $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
-            var fieldName = $(this).attr('name');
-            var fieldValue = $(this).val();
+    // Collect data from Add form (off-canvas) if present
+    $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
+        var fieldName = $(this).attr('name');
+        var fieldValue = $(this).val();
 
-            if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
-            } else {
-                formData[fieldName] = fieldValue;
+        if ($(this).attr('type') == 'checkbox') {
+            // Initialize an array for checkbox values if it doesn't exist
+            if (!formData[fieldName]) {
+                formData[fieldName] = [];
             }
-        });
-
-        // Collect data from Edit form (modal) if present
-        $('.append_field input, .append_field select, .append_field textarea').each(function() {
-            var fieldName = $(this).attr('name');
-            var fieldValue = $(this).val();
-
-            if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
-            } else {
-                formData[fieldName] = fieldValue;
+            if ($(this).is(':checked')) {
+                formData[fieldName].push($(this).val()); // Push checked value to the array
             }
-        });
-
-        var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
-        var editId = formData['id']; // Capture the id from the form
-
-        // Check if `id` is explicitly "undefined" or missing (insert mode)
-        if (editId && editId !== "undefined") {
-            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
+        } else if ($(this).attr('type') == 'date') {
+            formData[fieldName] = formatDate(fieldValue);
         } else {
-            delete formData['id']; // Remove the undefined id from formData for insert
+            formData[fieldName] = fieldValue;
         }
+    });
 
-        $.ajax({
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${getCookie('BearerToken')}`,
-            },
-            type: "POST",
-            url: apiUrl,
-            data: JSON.stringify(formData),
-            contentType: "application/json",
-            success: function(response) {
-                if ($('.edit_id').val()) {
-                    toastr.success("Data updated successfully");
-                } else {
-                    toastr.success("Data inserted successfully");
-                }
+    // Collect data from Edit form (modal) if present
+    $('.append_field input, .append_field select, .append_field textarea').each(function() {
+        var fieldName = $(this).attr('name');
+        var fieldValue = $(this).val();
 
-                // Close the modal or off-canvas
-                if ($('.offcanvas').length) {
-                    $('.offcanvas').offcanvas('hide');
-                }
-                if ($('.edit').length) {
-                    $('#edit-model').modal('hide');
-                }
-
-                location.reload();
-                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
-            },
-            error: function(response) {
-                loader(false);
-                if (response.status == 422) {
-                    var errors = response.responseJSON.data;
-                    $.each(errors, function(field, messages) {
-                        toastr.error(messages[0]);
-                    });
-                } else if (response.status == 500) {
-                    toastr.error("Something went wrong");
-                } else {
-                    toastr.error(response.responseJSON.message);
-                }
+        if ($(this).attr('type') == 'checkbox') {
+            // Initialize an array for checkbox values if it doesn't exist
+            if (!formData[fieldName]) {
+                formData[fieldName] = [];
             }
-        });
+            if ($(this).is(':checked')) {
+                formData[fieldName].push($(this).val()); // Push checked value to the array
+            }
+        } else if ($(this).attr('type') == 'date') {
+            formData[fieldName] = formatDate(fieldValue);
+        } else {
+            formData[fieldName] = fieldValue;
+        }
+    });
+
+    var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
+    var editId = formData['id']; // Capture the id from the form
+
+    // Check if `id` is explicitly "undefined" or missing (insert mode)
+    if (editId && editId !== "undefined") {
+        apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
+    } else {
+        delete formData['id']; // Remove the undefined id from formData for insert
     }
+
+    $.ajax({
+        headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${getCookie('BearerToken')}`,
+        },
+        type: "POST",
+        url: apiUrl,
+        data: JSON.stringify(formData),
+        contentType: "application/json",
+        success: function(response) {
+            if ($('.edit_id').val()) {
+                toastr.success("Data updated successfully");
+            } else {
+                toastr.success("Data inserted successfully");
+            }
+
+            // Close the modal or off-canvas
+            if ($('.offcanvas').length) {
+                $('.offcanvas').offcanvas('hide');
+            }
+            if ($('.edit').length) {
+                $('#edit-model').modal('hide');
+            }
+
+            location.reload();
+            fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
+        },
+        error: function(response) {
+            loader(false);
+            if (response.status == 422) {
+                var errors = response.responseJSON.data;
+                $.each(errors, function(field, messages) {
+                    toastr.error(messages[0]);
+                });
+            } else if (response.status == 500) {
+                toastr.error("Something went wrong");
+            } else {
+                toastr.error(response.responseJSON.message);
+            }
+        }
+    });
+}
 
 
     function fetchAndEditSection(id, table_name, module_manager_id) {
