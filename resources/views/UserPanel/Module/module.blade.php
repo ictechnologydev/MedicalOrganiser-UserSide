@@ -310,7 +310,7 @@
             var value_list = field['comma_separated_values'];
 
             for (var i = 0; i < value_list.length; i++) {
-                var optionValue = String(value_list[i]['store_value']).trim();
+                var optionValue = String(value_list[i]['value']).trim();
                 var optionLabel = value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') :
                     '';
 
