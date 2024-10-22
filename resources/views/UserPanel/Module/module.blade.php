@@ -273,176 +273,193 @@
     function edit_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
         var value = '';
-        if (field['child_store_value']) {
-            value = field['child_store_value']['value'];
+
+        // Determine the value to be used for pre-selecting options
+        if (field['child_store_value'] && field['child_store_value']['value']) {
+            value = String(field['child_store_value']['value']).trim();
+        } else if (field['value']) {
+            value = String(field['value']).trim();
         } else if (field['store_value']) {
-            value = field['store_value'];
+            value = String(field['store_value']).trim();
         }
-        // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
+
+        // Construct the field name, considering parent field if applicable
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
 
-        if (field['type'] == 'text') {
+        if (field['type'] === 'text') {
             html_field += `
-            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${ value }" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+            <input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
-        if (field['type'] == 'number') {
+        if (field['type'] === 'number') {
             html_field += `
-            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
-        if (field['type'] == 'email') {
+        if (field['type'] === 'email') {
             html_field += `
-            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
-        if (field['type'] == 'image') {
+        if (field['type'] === 'image') {
             html_field += `
-            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
-        if (field['type'] == 'datepicker') {
+        if (field['type'] === 'datepicker') {
             html_field += `
-            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${ field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
-            `;
+            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
+        `;
         }
-        if (field['type'] == 'radio') {
+        if (field['type'] === 'radio') {
             var value_list = field['comma_separated_values'];
 
-            for (var i = 0; i < value_list.length; i++) {
-                var optionValue = String(value_list[i]['value']).trim();
-                var optionLabel = value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') :
-                    '';
+            value_list.forEach((item, i) => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
-                // Correct comparison: store_value should match optionValue
-                var isChecked = (field['store_value'] === optionValue) ? 'checked' : (i === 0 ? 'checked' : '');
+                // Determine if this radio button should be checked
+                var isChecked = (field['store_value'] === optionValue) || (i === 0 && !field['store_value']);
 
                 html_field += `
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="${fieldName}" value="${optionValue}" ${isChecked}>
+                    <input class="form-check-input" type="radio" name="${fieldName}" value="${optionValue}" ${isChecked ? 'checked' : ''}>
                     <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
                 </div>
-                `;
-            }
+            `;
+            });
         }
 
-        if (field['type'] == 'checkbox') {
+        if (field['type'] === 'checkbox') {
             var value_list = field['comma_separated_values'];
+            var selected_values = field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
 
-            // Parse 'store_value' into an array of selected values
-            var selectedValues = [];
-            if (field['store_value']) {
-                selectedValues = field['store_value'].split(',').map(function(item) {
-                    return item.trim();
-                });
-            }
-
-            for (var i = 0; i < value_list.length; i++) {
-                var optionValue = String(value_list[i]['value']).trim();
-                var optionLabel = value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') :
-                    '';
-
-                // Check if this option should be selected
-                var isChecked = selectedValues.includes(optionValue);
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+                var isChecked = selected_values.includes(optionValue);
 
                 html_field += `
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${optionValue}" ${ isChecked ? 'checked' : '' }>
-            <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
-        </div>
-        `;
-            }
-        }
-        if (field['type'] == 'dropdown') {
-            var value_list = field['comma_separated_values'];
-
-            html_field +=
-                `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
-
-            // Add default "Select value" option
-            html_field +=
-                `<option value="">Select value</option>`;
-
-            for (var i = 0; i < value_list.length; i++) {
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
-            }
-
-            html_field += `</select>`;
-        }
-        if (field['type'] == 'multi_layer_inline_dropdown') {
-            var value_list = field['comma_separated_values'];
-
-            html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
-
-            // Add default "Select value" option
-            html_field +=
-                `<option value="">Select value</option>`;
-
-            for (var i = 0; i < value_list.length; i++) {
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
-            }
-
-            html_field += `</select>`;
-        }
-
-        if (field['type'] == 'multiselect') {
-            var value_list = field['comma_separated_values'];
-
-            html_field +=
-                `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`; // Added [] to name
-
-            // Add default "Select value" option
-            html_field += `<option value="">Select value</option>`;
-
-            // Parse 'store_value' into an array of selected values
-            var selectedValues = [];
-            if (field['store_value']) {
-                selectedValues = field['store_value'].split(',').map(function(item) {
-                    return item.trim();
-                });
-            }
-
-            for (var i = 0; i < value_list.length; i++) {
-                var optionValue = String(value_list[i]['value']).trim();
-                var isChecked = selectedValues.includes(optionValue); // Updated isChecked logic
-                html_field +=
-                    `<option value="${optionValue}" ${isChecked ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
-            }
-
-            html_field += `</select>`;
-        }
-
-        if (field['type'] == 'multi_label_dropdown') {
-            var value_list = field['comma_separated_values'];
-
-            html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
-
-            // Add default "Select value" option
-            html_field +=
-                `<option value="">Select value</option>`;
-
-            for (var i = 0; i < value_list.length; i++) {
-                var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
-            }
-
-            html_field += `</select>`;
-        }
-        if (field['type'] == 'textarea') {
-            html_field += `
-            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${ field['store_value'] ? field['store_value'] : ''}</textarea>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${optionValue}" ${isChecked ? 'checked' : ''}>
+                    <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
+                </div>
             `;
+            });
+        }
+
+        if (field['type'] === 'dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field += `
+            <select class="form-control" id="${fieldName}" name="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''}>
+                <option value="">Select value</option>
+        `;
+
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+
+                // Determine if this option should be selected
+                var isSelected = false;
+                if (field['child_store_value'] && field['child_store_value']['value']) {
+                    // For child dropdowns, compare with 'value'
+                    isSelected = value === optionValue;
+                } else {
+                    // For main dropdowns, compare with 'label'
+                    isSelected = value === optionLabel;
+                }
+
+                html_field += `
+                <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+            `;
+            });
+
+            html_field += `</select>`;
+        }
+
+        if (field['type'] === 'multi_layer_inline_dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field += `
+            <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
+                <option value="">Select value</option>
+        `;
+
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+
+                var isSelected = value === optionLabel;
+
+                html_field += `
+                <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+            `;
+            });
+
+            html_field += `</select>`;
+        }
+
+        if (field['type'] === 'multiselect') {
+            var value_list = field['comma_separated_values'];
+            var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
+                field['child_store_value']['value'].split(',').map(v => v.trim()) // Handle child selected values
+                :
+                field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
+
+            html_field += `
+    <select class="form-control" id="${fieldName}" name="${fieldName}[]" data-placeholder="Please select values" multiple>
+        <option value="">Select value</option>
+    `;
+
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim() : '';
+
+                // Check if this option is part of the selected values
+                var isSelected = selectedValues.includes(optionValue);
+
+                html_field += `
+        <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+    `;
+            });
+
+            html_field += `</select>`;
+        }
+
+
+        if (field['type'] === 'multi_label_dropdown') {
+            var value_list = field['comma_separated_values'];
+
+            html_field += `
+        <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
+            <option value="">Select value</option>
+    `;
+
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim(); // Correct value to be used
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+
+                // Determine if this option should be selected
+                var isSelected = value === optionValue; // Compare value with optionValue for main dropdown
+
+                html_field += `
+            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+        `;
+            });
+
+            html_field += `</select>`;
+        }
+
+        if (field['type'] === 'textarea') {
+            html_field += `
+            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${field['store_value'] ? field['store_value'] : ''}</textarea>
+        `;
         }
 
         return html_field;
     }
+
 
     function create_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
@@ -879,29 +896,45 @@
 
         var formData = {};
 
+        // Iterate over inputs, selects, and textareas in the edit form
         $('.append_field input, .append_field select, .append_field textarea').each(function() {
-            var fieldName = $(this).attr('name').replace(/\[\]$/, '');
-            var fieldValue = $(this).val();
+            var fieldName = $(this).attr('name');
 
-            if ($(this).attr('type') == 'checkbox') {
-                if (!formData[fieldName]) {
-                    formData[fieldName] = [];
+            // Check if the field has a name attribute
+            if (fieldName) {
+                // Remove trailing [] if present
+                fieldName = fieldName.replace(/\[\]$/, '');
+                var fieldValue = $(this).val();
+
+                // Handle checkboxes
+                if ($(this).attr('type') == 'checkbox') {
+                    if (!formData[fieldName]) {
+                        formData[fieldName] = [];
+                    }
+                    if ($(this).is(':checked')) {
+                        formData[fieldName].push($(this).val());
+                    }
                 }
-                if ($(this).is(':checked')) {
-                    formData[fieldName].push($(this).val());
+                // Handle radio buttons
+                else if ($(this).attr('type') == 'radio') {
+                    if ($(this).is(':checked')) {
+                        formData[fieldName] = fieldValue;
+                    }
                 }
-            } else if ($(this).attr('type') == 'radio') {
-                if ($(this).is(':checked')) {
+                // Handle date fields
+                else if ($(this).attr('type') == 'date') {
+                    formData[fieldName] = formatDate(fieldValue);
+                }
+                // Handle other input types
+                else {
                     formData[fieldName] = fieldValue;
                 }
-            } else if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
             } else {
-                formData[fieldName] = fieldValue;
+                console.warn('A form element is missing the name attribute and was skipped:', this);
             }
         });
 
-        console.log('Edit Form Data:', formData); // Debugging
+        console.log('Edit Form Data:', formData); // For debugging
 
         $.ajax({
             headers: {
@@ -914,10 +947,8 @@
             contentType: "application/json",
             success: function(response) {
                 loader(false);
-
                 toastr.success(response.message);
                 $('.modal').modal('hide');
-
                 fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
             },
             error: function(response) {
@@ -925,8 +956,7 @@
                 if (response.status == 422) {
                     var errors = response.responseJSON.data;
                     $.each(errors, function(field, messages) {
-                        var error_msg = messages[0];
-                        toastr.error(error_msg);
+                        toastr.error(messages[0]);
                     });
                 } else if (response.status == 500) {
                     toastr.error("Something went wrong");
@@ -935,7 +965,8 @@
                 }
             }
         });
-    }   
+    }
+
 
 
     function medicationOnChange() {
