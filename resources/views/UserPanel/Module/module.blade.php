@@ -331,19 +331,25 @@
         }
 
         if (field['type'] === 'checkbox') {
-            var value_list = field['comma_separated_values'];
-            var selected_values = field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
+            var selectedValues = [];
 
+            // Determine the value to be used for pre-selecting options
+            if (field['child_store_value'] && field['child_store_value']['value']) {
+                selectedValues = field['child_store_value']['value'].split(',').map(v => v.trim());
+            } else if (field['store_value']) {
+                selectedValues = field['store_value'].split(',').map(v => v.trim());
+            }
+            var value_list = field['comma_separated_values'];
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
-                var isChecked = selected_values.includes(optionValue);
+                var isChecked = selectedValues.includes(optionValue); // Check against the selected values
 
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${optionValue}" ${isChecked ? 'checked' : ''}>
-                    <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
-                </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${optionValue}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
+            </div>
             `;
             });
         }
