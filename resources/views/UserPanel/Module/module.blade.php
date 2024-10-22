@@ -282,6 +282,12 @@
         } else if (field['store_value']) {
             value = String(field['store_value']).trim();
         }
+        console.log(value);
+        if (field['store_value']) {
+            selected_value = String(field['store_value']).trim();
+        } else if (field['child_store_value'] && field['child_store_value']['value']) {
+            selected_value = String(field['child_store_value']['value']).trim();
+        }
 
         // Construct the field name, considering parent field if applicable
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
@@ -293,40 +299,38 @@
         }
         if (field['type'] === 'number') {
             html_field += `
-            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            <input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         }
         if (field['type'] === 'email') {
             html_field += `
-            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            <input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         }
         if (field['type'] === 'image') {
             html_field += `
-            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? field['store_value'] : ''}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            <input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         }
         if (field['type'] === 'datepicker') {
             html_field += `
-            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${field['store_value'] ? convertDateFormat(field['store_value']) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
+            <input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${value ? convertDateFormat(value) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">
         `;
         }
         if (field['type'] === 'radio') {
-            var value_list = field['comma_separated_values'];
-
-            value_list.forEach((item, i) => {
+            field['comma_separated_values'].forEach((item, i) => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
                 // Determine if this radio button should be checked
-                var isChecked = (field['store_value'] === optionValue) || (i === 0 && !field['store_value']);
+                var isChecked = (selected_value === optionValue) || (i === 0 && !selected_value);
 
                 html_field += `
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="${fieldName}" value="${optionValue}" ${isChecked ? 'checked' : ''}>
-                    <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
-                </div>
-            `;
+            <div class="form-check">
+                <input class="form-check-input" type="radio" id="${fieldName}-${item['value']}" name="${fieldName}" value="${optionValue}" ${isChecked ? 'checked' : ''}>
+                <label class="form-check-label" for="${fieldName}-${item['value']}" style="text-transform: capitalize;">${optionLabel}</label>
+            </div>
+        `;
             });
         }
 
@@ -459,7 +463,7 @@
 
         if (field['type'] === 'textarea') {
             html_field += `
-            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${field['store_value'] ? field['store_value'] : ''}</textarea>
+            <textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${value}</textarea>
         `;
         }
 
