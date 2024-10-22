@@ -282,7 +282,6 @@
         } else if (field['store_value']) {
             value = String(field['store_value']).trim();
         }
-        console.log(value);
         if (field['store_value']) {
             selected_value = String(field['store_value']).trim();
         } else if (field['child_store_value'] && field['child_store_value']['value']) {
