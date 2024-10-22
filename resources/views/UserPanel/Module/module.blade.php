@@ -273,12 +273,10 @@
     function edit_field_html(field, login_user, parentFieldName = null) {
         var html_field = ``;
         var value = '';
-        if (field['value']) {
-            value = field['value'];
+        if (field['child_store_value']) {
+            value = field['child_store_value']['value'];
         } else if (field['store_value']) {
             value = field['store_value'];
-        } else if (field['store_values'] && field['store_values'].length > 0) {
-            value = field['store_values'][0]['value'];
         }
         // Ensure we concatenate parent field name and current field's option only if parentFieldName is provided
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
@@ -311,26 +309,20 @@
         if (field['type'] == 'radio') {
             var value_list = field['comma_separated_values'];
 
-            // Get the selected value from 'store_value'
-            var selectedValue = '';
-            if (field['store_value']) {
-                selectedValue = field['store_value'].trim();
-            }
-
             for (var i = 0; i < value_list.length; i++) {
                 var optionValue = String(value_list[i]['value']).trim();
                 var optionLabel = value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') :
-                '';
+                    '';
 
-                // Check if this option should be selected
-                var isChecked = (selectedValue === optionValue);
+                // Correct comparison: store_value should match optionValue
+                var isChecked = (field['store_value'] === optionValue) ? 'checked' : (i === 0 ? 'checked' : '');
 
                 html_field += `
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="${fieldName}" value="${optionValue}" ${ isChecked ? 'checked' : '' }>
-            <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
-        </div>
-        `;
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="${fieldName}" value="${optionValue}" ${isChecked}>
+                    <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
+                </div>
+                `;
             }
         }
 
@@ -348,7 +340,7 @@
             for (var i = 0; i < value_list.length; i++) {
                 var optionValue = String(value_list[i]['value']).trim();
                 var optionLabel = value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') :
-                '';
+                    '';
 
                 // Check if this option should be selected
                 var isChecked = selectedValues.includes(optionValue);
@@ -737,105 +729,110 @@
     module_name(getParams('name'));
 
     function submitData(event) {
-    console.log('submit');
-    event.preventDefault();
+        console.log('submit');
+        event.preventDefault();
 
-    loader(true);
+        loader(true);
 
-    var formData = {};
+        var formData = {};
 
-    // Collect data from Add form (off-canvas) if present
-    $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
-        var fieldName = $(this).attr('name');
-        var fieldValue = $(this).val();
+        // Collect data from Add form (off-canvas) if present
+        $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
+            var fieldName = $(this).attr('name');
+            var fieldValue = $(this).val();
 
-        if ($(this).attr('type') == 'checkbox') {
-            // Initialize an array for checkbox values if it doesn't exist
-            if (!formData[fieldName]) {
-                formData[fieldName] = [];
+            if ($(this).attr('type') == 'checkbox') {
+                // Initialize an array for checkbox values if it doesn't exist
+                if (!formData[fieldName]) {
+                    formData[fieldName] = [];
+                }
+                if ($(this).is(':checked')) {
+                    formData[fieldName].push($(this).val()); // Push checked value to the array
+                }
+            } else
+            if ($(this).attr('type') == 'radio') {
+                if ($(this).is(':checked')) {
+                    formData[fieldName] = fieldValue;
+                }
+            } else if ($(this).attr('type') == 'date') {
+                formData[fieldName] = formatDate(fieldValue);
+            } else {
+                formData[fieldName] = fieldValue;
             }
-            if ($(this).is(':checked')) {
-                formData[fieldName].push($(this).val()); // Push checked value to the array
+        });
+
+        // Collect data from Edit form (modal) if present
+        $('.append_field input, .append_field select, .append_field textarea').each(function() {
+            var fieldName = $(this).attr('name');
+            var fieldValue = $(this).val();
+
+            if ($(this).attr('type') == 'checkbox') {
+                // Initialize an array for checkbox values if it doesn't exist
+                if (!formData[fieldName]) {
+                    formData[fieldName] = [];
+                }
+                if ($(this).is(':checked')) {
+                    formData[fieldName].push($(this).val()); // Push checked value to the array
+                }
+            } else if ($(this).attr('type') == 'date') {
+                formData[fieldName] = formatDate(fieldValue);
+            } else {
+                formData[fieldName] = fieldValue;
             }
-        } else if ($(this).attr('type') == 'date') {
-            formData[fieldName] = formatDate(fieldValue);
+        });
+
+        var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
+        var editId = formData['id']; // Capture the id from the form
+
+        // Check if `id` is explicitly "undefined" or missing (insert mode)
+        if (editId && editId !== "undefined") {
+            apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
         } else {
-            formData[fieldName] = fieldValue;
+            delete formData['id']; // Remove the undefined id from formData for insert
         }
-    });
 
-    // Collect data from Edit form (modal) if present
-    $('.append_field input, .append_field select, .append_field textarea').each(function() {
-        var fieldName = $(this).attr('name');
-        var fieldValue = $(this).val();
+        $.ajax({
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${getCookie('BearerToken')}`,
+            },
+            type: "POST",
+            url: apiUrl,
+            data: JSON.stringify(formData),
+            contentType: "application/json",
+            success: function(response) {
+                if ($('.edit_id').val()) {
+                    toastr.success("Data updated successfully");
+                } else {
+                    toastr.success("Data inserted successfully");
+                }
 
-        if ($(this).attr('type') == 'checkbox') {
-            // Initialize an array for checkbox values if it doesn't exist
-            if (!formData[fieldName]) {
-                formData[fieldName] = [];
+                // Close the modal or off-canvas
+                if ($('.offcanvas').length) {
+                    $('.offcanvas').offcanvas('hide');
+                }
+                if ($('.edit').length) {
+                    $('#edit-model').modal('hide');
+                }
+
+                location.reload();
+                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
+            },
+            error: function(response) {
+                loader(false);
+                if (response.status == 422) {
+                    var errors = response.responseJSON.data;
+                    $.each(errors, function(field, messages) {
+                        toastr.error(messages[0]);
+                    });
+                } else if (response.status == 500) {
+                    toastr.error("Something went wrong");
+                } else {
+                    toastr.error(response.responseJSON.message);
+                }
             }
-            if ($(this).is(':checked')) {
-                formData[fieldName].push($(this).val()); // Push checked value to the array
-            }
-        } else if ($(this).attr('type') == 'date') {
-            formData[fieldName] = formatDate(fieldValue);
-        } else {
-            formData[fieldName] = fieldValue;
-        }
-    });
-
-    var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
-    var editId = formData['id']; // Capture the id from the form
-
-    // Check if `id` is explicitly "undefined" or missing (insert mode)
-    if (editId && editId !== "undefined") {
-        apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
-    } else {
-        delete formData['id']; // Remove the undefined id from formData for insert
+        });
     }
-
-    $.ajax({
-        headers: {
-            "Accept": "application/json",
-            "Authorization": `Bearer ${getCookie('BearerToken')}`,
-        },
-        type: "POST",
-        url: apiUrl,
-        data: JSON.stringify(formData),
-        contentType: "application/json",
-        success: function(response) {
-            if ($('.edit_id').val()) {
-                toastr.success("Data updated successfully");
-            } else {
-                toastr.success("Data inserted successfully");
-            }
-
-            // Close the modal or off-canvas
-            if ($('.offcanvas').length) {
-                $('.offcanvas').offcanvas('hide');
-            }
-            if ($('.edit').length) {
-                $('#edit-model').modal('hide');
-            }
-
-            location.reload();
-            fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
-        },
-        error: function(response) {
-            loader(false);
-            if (response.status == 422) {
-                var errors = response.responseJSON.data;
-                $.each(errors, function(field, messages) {
-                    toastr.error(messages[0]);
-                });
-            } else if (response.status == 500) {
-                toastr.error("Something went wrong");
-            } else {
-                toastr.error(response.responseJSON.message);
-            }
-        }
-    });
-}
 
 
     function fetchAndEditSection(id, table_name, module_manager_id) {
@@ -882,18 +879,29 @@
 
         var formData = {};
 
-
         $('.append_field input, .append_field select, .append_field textarea').each(function() {
-            var fieldName = $(this).attr('name');
+            var fieldName = $(this).attr('name').replace(/\[\]$/, '');
             var fieldValue = $(this).val();
 
-            if ($(this).attr('type') == 'date') {
+            if ($(this).attr('type') == 'checkbox') {
+                if (!formData[fieldName]) {
+                    formData[fieldName] = [];
+                }
+                if ($(this).is(':checked')) {
+                    formData[fieldName].push($(this).val());
+                }
+            } else if ($(this).attr('type') == 'radio') {
+                if ($(this).is(':checked')) {
+                    formData[fieldName] = fieldValue;
+                }
+            } else if ($(this).attr('type') == 'date') {
                 formData[fieldName] = formatDate(fieldValue);
             } else {
                 formData[fieldName] = fieldValue;
             }
         });
 
+        console.log('Edit Form Data:', formData); // Debugging
 
         $.ajax({
             headers: {
@@ -907,22 +915,17 @@
             success: function(response) {
                 loader(false);
 
-
                 toastr.success(response.message);
                 $('.modal').modal('hide');
-                var rowIdToUpdate = formData.row_id;
 
-
-
-                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'))
-
+                fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
             },
             error: function(response) {
                 loader(false);
                 if (response.status == 422) {
                     var errors = response.responseJSON.data;
                     $.each(errors, function(field, messages) {
-                        error_msg = messages[0];
+                        var error_msg = messages[0];
                         toastr.error(error_msg);
                     });
                 } else if (response.status == 500) {
