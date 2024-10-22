@@ -751,7 +751,8 @@
 
         loader(true);
 
-        var formData = {};
+        // Create a FormData object to handle files and other form data
+        var formData = new FormData();
 
         // Collect data from Add form (off-canvas) if present
         $('.append_fields input, .append_fields select, .append_fields textarea').each(function() {
@@ -760,21 +761,25 @@
 
             if ($(this).attr('type') == 'checkbox') {
                 // Initialize an array for checkbox values if it doesn't exist
-                if (!formData[fieldName]) {
-                    formData[fieldName] = [];
+                if (!formData.has(fieldName)) {
+                    formData.append(fieldName, []); // Initialize as an array
                 }
                 if ($(this).is(':checked')) {
-                    formData[fieldName].push($(this).val()); // Push checked value to the array
+                    formData.append(fieldName, $(this).val()); // Append checked value to the array
                 }
-            } else
-            if ($(this).attr('type') == 'radio') {
+            } else if ($(this).attr('type') == 'radio') {
                 if ($(this).is(':checked')) {
-                    formData[fieldName] = fieldValue;
+                    formData.set(fieldName, fieldValue);
                 }
             } else if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
+                formData.set(fieldName, formatDate(fieldValue));
+            } else if ($(this).attr('type') == 'file') {
+                // Handle file inputs
+                if ($(this)[0].files.length > 0) {
+                    formData.append(fieldName, $(this)[0].files[0]); // Append the file to the form data
+                }
             } else {
-                formData[fieldName] = fieldValue;
+                formData.set(fieldName, fieldValue);
             }
         });
 
@@ -785,27 +790,27 @@
 
             if ($(this).attr('type') == 'checkbox') {
                 // Initialize an array for checkbox values if it doesn't exist
-                if (!formData[fieldName]) {
-                    formData[fieldName] = [];
+                if (!formData.has(fieldName)) {
+                    formData.append(fieldName, []); // Initialize as an array
                 }
                 if ($(this).is(':checked')) {
-                    formData[fieldName].push($(this).val()); // Push checked value to the array
+                    formData.append(fieldName, $(this).val()); // Append checked value to the array
                 }
             } else if ($(this).attr('type') == 'date') {
-                formData[fieldName] = formatDate(fieldValue);
+                formData.set(fieldName, formatDate(fieldValue));
             } else {
-                formData[fieldName] = fieldValue;
+                formData.set(fieldName, fieldValue);
             }
         });
 
         var apiUrl = "{{ config('app.api_url') }}/api/section-data/insert"; // Default for insert
-        var editId = formData['id']; // Capture the id from the form
+        var editId = formData.get('id'); // Capture the id from the form
 
         // Check if `id` is explicitly "undefined" or missing (insert mode)
         if (editId && editId !== "undefined") {
             apiUrl = "{{ config('app.api_url') }}/api/section-data/update"; // Use update API if id is valid
         } else {
-            delete formData['id']; // Remove the undefined id from formData for insert
+            formData.delete('id'); // Remove the undefined id from formData for insert
         }
 
         $.ajax({
@@ -815,8 +820,9 @@
             },
             type: "POST",
             url: apiUrl,
-            data: JSON.stringify(formData),
-            contentType: "application/json",
+            data: formData,
+            processData: false, // Important to prevent jQuery from automatically processing the data
+            contentType: false, // Important to prevent jQuery from automatically setting the content type
             success: function(response) {
                 if ($('.edit_id').val()) {
                     toastr.success("Data updated successfully");
@@ -850,6 +856,7 @@
             }
         });
     }
+
 
 
     function fetchAndEditSection(id, table_name, module_manager_id) {
@@ -894,47 +901,43 @@
 
         loader(true);
 
-        var formData = {};
+        // Use FormData to handle both files and regular inputs
+        var formData = new FormData();
 
-        // Iterate over inputs, selects, and textareas in the edit form
+        // Collect data from Edit form (modal)
         $('.append_field input, .append_field select, .append_field textarea').each(function() {
             var fieldName = $(this).attr('name');
-
-            // Check if the field has a name attribute
+            var fieldValue = $(this).val();
             if (fieldName) {
-                // Remove trailing [] if present
-                fieldName = fieldName.replace(/\[\]$/, '');
-                var fieldValue = $(this).val();
-
-                // Handle checkboxes
                 if ($(this).attr('type') == 'checkbox') {
-                    if (!formData[fieldName]) {
-                        formData[fieldName] = [];
+                    // Initialize an array for checkbox values if it doesn't exist
+                    if (!formData.has(fieldName)) {
+                        formData.append(fieldName, []); // Initialize as an array
                     }
                     if ($(this).is(':checked')) {
-                        formData[fieldName].push($(this).val());
+                        formData.append(fieldName, $(this).val()); // Append checked value to the array
                     }
-                }
-                // Handle radio buttons
-                else if ($(this).attr('type') == 'radio') {
+                } else if ($(this).attr('type') == 'radio') {
                     if ($(this).is(':checked')) {
-                        formData[fieldName] = fieldValue;
+                        formData.set(fieldName, fieldValue);
                     }
-                }
-                // Handle date fields
-                else if ($(this).attr('type') == 'date') {
-                    formData[fieldName] = formatDate(fieldValue);
-                }
-                // Handle other input types
-                else {
-                    formData[fieldName] = fieldValue;
+                } else if ($(this).attr('type') == 'date') {
+                    formData.set(fieldName, formatDate(fieldValue));
+                } else if ($(this).attr('type') == 'file') {
+                    // Handle file inputs
+                    if ($(this)[0].files.length > 0) {
+                        console.log('File being added in edit form:', $(this)[0].files[0]);
+                        formData.append(fieldName, $(this)[0].files[0]); // Append the actual file to FormData
+                    }
+                } else {
+                    formData.set(fieldName, fieldValue);
                 }
             } else {
                 console.warn('A form element is missing the name attribute and was skipped:', this);
             }
         });
 
-        console.log('Edit Form Data:', formData); // For debugging
+        console.log('Edit Form Data:', formData); // Debugging
 
         $.ajax({
             headers: {
@@ -943,12 +946,14 @@
             },
             type: "POST",
             url: "{{ config('app.api_url') }}/api/section-data/update",
-            data: JSON.stringify(formData),
-            contentType: "application/json",
+            data: formData,
+            processData: false, // Important to prevent jQuery from automatically processing the data
+            contentType: false, // Important to prevent jQuery from automatically setting the content type
             success: function(response) {
                 loader(false);
                 toastr.success(response.message);
                 $('.modal').modal('hide');
+
                 fetch_all_data(getParams('m_id'), getParams('tb'), '0', '', getCookie('user_id'));
             },
             error: function(response) {
@@ -956,7 +961,8 @@
                 if (response.status == 422) {
                     var errors = response.responseJSON.data;
                     $.each(errors, function(field, messages) {
-                        toastr.error(messages[0]);
+                        var error_msg = messages[0];
+                        toastr.error(error_msg);
                     });
                 } else if (response.status == 500) {
                     toastr.error("Something went wrong");
@@ -966,7 +972,6 @@
             }
         });
     }
-
 
 
     function medicationOnChange() {
