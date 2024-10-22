@@ -1203,64 +1203,69 @@
     }
 
     // Function to handle showing/hiding of dependent fields
-        function handleFieldVisibility() {
-            // Listen for changes on select, checkbox, and radio inputs
-            $('select, input[type="checkbox"], input[type="radio"]').on('change', function() {
-                var selectedValues = [];
+    function handleFieldVisibility() {
+        // Listen for changes on select, checkbox, and radio inputs
+        $('select, input[type="checkbox"], input[type="radio"]').on('change', function() {
+            var selectedValues = [];
 
-                if ($(this).is('select')) {
-                    selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
-                } else if ($(this).is('input[type="checkbox"]')) {
-                    // Collect checked values if it's a checkbox
-                    $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
-                        selectedValues.push($(this).val());
-                    });
-                } else if ($(this).is('input[type="radio"]')) {
-                    // Get selected value if it's a radio button
-                    selectedValues.push($('input[name="' + $(this).attr('name') + '"]:checked').val());
-                }
-
-                var parentField = $(this).attr('name');
-                console.log(selectedValues, 'selectedValues');
-                console.log(parentField, 'parentField');
-
-                if (!Array.isArray(selectedValues)) {
-                    // Convert single select value to an array for consistency
-                    selectedValues = [selectedValues];
-                }
-
-                // Loop through dependent fields and show/hide based on selected values
-                $('.dependent-field').each(function() {
-                    var parent = $(this).data('parent');
-                    var selectedValuesForChild = $(this).data(
-                    'selected-values'); // selected_values for the child
-                    console.log(selectedValuesForChild, 'child');
-                    console.log(parent, 'parent');
-
-                    if (parent === parentField) {
-                        if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                            // Iterate through selected values and compare them with child values
-                            var shouldShow = selectedValues.some(function(val) {
-                                return selectedValuesForChild.some(function(childVal) {
-                                    // Compare by string conversion to handle alphanumeric values
-                                    return String(childVal.value).trim().toLowerCase() ===
-                                        String(val).trim().toLowerCase();
-                                });
-                            });
-
-                            if (shouldShow) {
-                                $(this).removeClass('d-none'); // Show child field if match found
-                            } else {
-                                $(this).addClass('d-none'); // Hide if no match found
-                            }
-                        } else {
-                            // If no selected values for child, show the field by default
-                            $(this).removeClass('d-none');
-                        }
-                    }
+            // Handle select input
+            if ($(this).is('select')) {
+                selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+            }
+            // Handle checkbox input
+            else if ($(this).is('input[type="checkbox"]')) {
+                // Collect checked values if it's a checkbox
+                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
+                    selectedValues.push($(this).val());
                 });
+            }
+            // Handle radio input
+            else if ($(this).is('input[type="radio"]')) {
+                selectedValues.push($(this).val()); // Get the selected radio value
+            }
+
+            var parentField = $(this).attr('name');
+            console.log(selectedValues, 'selectedValues');
+            console.log(parentField, 'parentField');
+
+            if (!Array.isArray(selectedValues)) {
+                // Convert single select or radio value to an array for consistency
+                selectedValues = [selectedValues];
+            }
+
+            // Loop through dependent fields and show/hide based on selected values
+            $('.dependent-field').each(function() {
+                var parent = $(this).data('parent');
+                var selectedValuesForChild = $(this).data(
+                'selected-values'); // selected_values for the child
+                console.log(selectedValuesForChild, 'child');
+                console.log(parent, 'parent');
+
+                if (parent === parentField) {
+                    if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                        // Iterate through selected values and compare them with child values
+                        var shouldShow = selectedValues.some(function(val) {
+                            return selectedValuesForChild.some(function(childVal) {
+                                // Compare by string conversion to handle alphanumeric values
+                                return String(childVal.value).trim().toLowerCase() ===
+                                    String(val).trim().toLowerCase();
+                            });
+                        });
+
+                        if (shouldShow) {
+                            $(this).removeClass('d-none'); // Show child field if match found
+                        } else {
+                            $(this).addClass('d-none'); // Hide if no match found
+                        }
+                    } else {
+                        // If no selected values for child, show the field by default
+                        $(this).removeClass('d-none');
+                    }
+                }
             });
-        }
+        });
+    }
+
 
 
 
