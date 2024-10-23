@@ -287,7 +287,9 @@
         } else if (field['child_store_value'] && field['child_store_value']['value']) {
             selected_value = String(field['child_store_value']['value']).trim();
         }
-
+        if (!value) {
+            return ''; // Skip rendering this field if no value is present
+        }
         // Construct the field name, considering parent field if applicable
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
 
@@ -1088,11 +1090,20 @@
                 }
                 var editfields = _this;
 
-
                 var html_fields = '';
                 var __check = 0;
                 var __div = 0;
+
+                // **Loop through editfields and include only fields with values**
                 for (var i = 0; i < editfields.length; i++) {
+                    // Check if the field has a value
+                    var hasValue = editfields[i]['value'] || editfields[i]['store_value'] ||
+                        (editfields[i]['child_store_value'] && editfields[i]['child_store_value']['value']);
+
+                    if (!hasValue) {
+                        continue; // Skip this field if it doesn't have a value
+                    }
+
                     if (editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
                         html_fields += `<div class="d-flex">`;
                         __check = 1;
@@ -1115,6 +1126,15 @@
                         ].length > 0) {
                         for (var j = 0; j < editfields[i]['module_meta_dependencies'].length; j++) {
                             var childField = editfields[i]['module_meta_dependencies'][j];
+                            // Check if the child field has a value
+                            var childHasValue = childField['value'] || childField['store_value'] ||
+                                (childField['child_store_value'] && childField['child_store_value'][
+                                    'value']);
+
+                            if (!childHasValue) {
+                                continue; // Skip child field if no value
+                            }
+
                             html_fields += `<div class="mb-3">`;
                             html_fields +=
                                 `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
@@ -1125,7 +1145,6 @@
 
                     html_fields += `</div>`;
                 }
-                console.log(html_fields);
 
 
                 // Add hidden fields for the form
@@ -1154,6 +1173,7 @@
                     $('.append_field').html(html_fields);
                     $('.append_field button').text('Update');
                     $('.append_field button').attr('onclick', 'editData(event)');
+
                 } else {
                     // Add mode
                     $('.append_fields').html(html_field);
@@ -1176,6 +1196,7 @@
 
                 // Handle the visibility of dependent fields based on the selection
                 handleFieldVisibility();
+                handleEditFieldVisibility();
             },
             error: function(response) {
                 loader(false);
@@ -1237,7 +1258,7 @@
             $('.dependent-field').each(function() {
                 var parent = $(this).data('parent');
                 var selectedValuesForChild = $(this).data(
-                'selected-values'); // selected_values for the child
+                    'selected-values'); // selected_values for the child
                 console.log(selectedValuesForChild, 'child');
                 console.log(parent, 'parent');
 
@@ -1267,6 +1288,75 @@
     }
 
 
+    function handleEditFieldVisibility() {
+        // Apply changes on select, checkbox, and radio inputs within the edit modal
+        $('#edit-model').on('change', 'select, input[type="checkbox"], input[type="radio"]', function() {
+            // alert(1);
+            var selectedValues = [];
+
+            // Handle select input
+            if ($(this).is('select')) {
+                selectedValues = $(this).val(); // Get selected values (for multi-select, it's an array)
+            }
+            // Handle checkbox input
+            else if ($(this).is('input[type="checkbox"]')) {
+                // Collect checked values if it's a checkbox
+                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
+                    selectedValues.push($(this).val());
+                });
+            }
+            // Handle radio input
+            else if ($(this).is('input[type="radio"]')) {
+                selectedValues.push($(this).val()); // Get the selected radio value
+            }
+
+            var parentField = $(this).attr('name');
+            console.log(selectedValues, 'selectedValues');
+            console.log(parentField, 'parentField');
+
+            if (!Array.isArray(selectedValues)) {
+                // Convert single select or radio value to an array for consistency
+                selectedValues = [selectedValues];
+            }
+
+            // Loop through dependent fields and show/hide based on selected values
+            $('.dependent-field').each(function() {
+                var parent = $(this).data('parent');
+                var selectedValuesForChild = $(this).data(
+                    'selected-values'); // selected_values for the child
+                console.log(selectedValuesForChild, 'child');
+                console.log(parent, 'parent');
+
+                if (parent === parentField) {
+                    if (selectedValuesForChild && selectedValuesForChild.length > 0) {
+                        // Iterate through selected values and compare them with child values
+                        var shouldShow = selectedValues.some(function(val) {
+                            return selectedValuesForChild.some(function(childVal) {
+                                // Compare by string conversion to handle alphanumeric values
+                                return String(childVal.value).trim().toLowerCase() ===
+                                    String(val).trim().toLowerCase();
+                            });
+                        });
+
+                        if (shouldShow) {
+                            $(this).removeClass('d-none'); // Show child field if match found
+                        } else {
+                            $(this).addClass('d-none'); // Hide if no match found
+                        }
+                    } else {
+                        // If no selected values for child, show the field by default
+                        $(this).removeClass('d-none');
+                    }
+                }
+            });
+        });
+    }
+
+
+    // Call this function once the modal is fully loaded or when dynamically adding fields
+    $(document).ready(function() {
+        handleEditFieldVisibility();
+    });
 
 
 
