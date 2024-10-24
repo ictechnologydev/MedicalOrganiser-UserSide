@@ -1019,115 +1019,120 @@
     }
 
     function add_data(_this, id) {
-    // Show loaders
-    $('.threeDotLoder-edit').show();
-    $('.threeDotLoder').show();
+        // Show loaders
+        $('.threeDotLoder-edit').show();
+        $('.threeDotLoder').show();
 
-    $.ajax({
-        headers: {
-            "Accept": "application/json",
-            "Authorization": `Bearer ${getCookie('BearerToken')}`,
-        },
-        type: "GET",
-        url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
-        success: function(response) {
-            var fields = response.data.module_manager.module_manager_meta;
-            var login_user = response.data.login_user;
-            var html_field = ``;
-            var __check = 0;
-            var __div = 0;
+        $.ajax({
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${getCookie('BearerToken')}`,
+            },
+            type: "GET",
+            url: `{{ config('app.api_url') }}/api/module-managers/${getParams('m_id')}`,
+            success: function(response) {
+                var fields = response.data.module_manager.module_manager_meta;
+                var login_user = response.data.login_user;
+                var html_field = ``;
+                var __check = 0;
+                var __div = 0;
 
-            // Loop through the fields for the add modal
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
-                    html_field += `<div class="d-flex">`;
-                    __check = 1;
-                    __div = 1;
-                }
+                // Loop through the fields for the add modal
+                for (let i = 0; i < fields.length; i++) {
+                    if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
+                        html_field += `<div class="d-flex">`;
+                        __check = 1;
+                        __div = 1;
+                    }
 
-                if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
-                    html_field += `</div>`;
-                    __check = 0;
-                    __div = 0;
-                }
-
-                // Main field creation
-                html_field +=
-                    `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
-                html_field +=
-                    `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
-
-                // Main field HTML
-                html_field += create_field_html(fields[i], login_user);
-
-                // Handle dependent fields (module_meta_dependencies)
-                if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length > 0) {
-                    for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
-                        let dependencyField = fields[i].module_meta_dependencies[dep];
-
-                        // Initially hide dependent fields with selected_values
-                        let hideClass = dependencyField.selected_values && dependencyField.selected_values.length > 0 ? 'd-none' : '';
-
-                        html_field +=
-                            `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
-                        html_field +=
-                            `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
-
-                        // Add the dependent field HTML
-                        html_field += create_field_html(dependencyField, login_user, fields[i].option);
-
+                    if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
                         html_field += `</div>`;
+                        __check = 0;
+                        __div = 0;
                     }
+
+                    // Main field creation
+                    html_field +=
+                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
+                    html_field +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+
+                    // Main field HTML
+                    html_field += create_field_html(fields[i], login_user);
+
+                    // Handle dependent fields (module_meta_dependencies)
+                    if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
+                        0) {
+                        for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
+                            let dependencyField = fields[i].module_meta_dependencies[dep];
+
+                            // Initially hide dependent fields with selected_values
+                            let hideClass = dependencyField.selected_values && dependencyField
+                                .selected_values.length > 0 ? 'd-none' : '';
+
+                            html_field +=
+                                `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                            html_field +=
+                                `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
+
+                            // Add the dependent field HTML
+                            html_field += create_field_html(dependencyField, login_user, fields[i].option);
+
+                            html_field += `</div>`;
+                        }
+                    }
+
+                    html_field += `</div>`;
                 }
 
-                html_field += `</div>`;
-            }
+                var editfields = _this;
 
-            var editfields = _this;
+                var html_fields = '';
+                var __check = 0;
+                var __div = 0;
 
-            var html_fields = '';
-            var __check = 0;
-            var __div = 0;
-
-            // Loop through editfields and include all fields
-            for (var i = 0; i < editfields.length; i++) {
-                if (editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
-                    html_fields += `<div class="d-flex">`;
-                    __check = 1;
-                    __div = 1;
-                }
-                if (editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
-                    html_fields += `</div>`;
-                    __check = 0;
-                    __div = 0;
-                }
-                html_fields +=
-                    `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}">`;
-                html_fields +=
-                    `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
-                html_fields += edit_field_html(editfields[i], login_user);
-
-                // Handle child fields
-                if (editfields[i]['module_meta_dependencies'] && editfields[i]['module_meta_dependencies'].length > 0) {
-                    for (var j = 0; j < editfields[i]['module_meta_dependencies'].length; j++) {
-                        var childField = editfields[i]['module_meta_dependencies'][j];
-
-                        // Include data-parent and data-selected-values attributes
-                        let hideClass = childField.selected_values && childField.selected_values.length > 0 ? 'd-none' : '';
-                        html_fields +=
-                            `<div class="mb-3 dependent-field ${hideClass}" data-parent="${editfields[i]['option']}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
-                        html_fields +=
-                            `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
-                        html_fields += edit_field_html(childField, login_user, editfields[i].option);
+                // Loop through editfields and include all fields
+                for (var i = 0; i < editfields.length; i++) {
+                    if (editfields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
+                        html_fields += `<div class="d-flex">`;
+                        __check = 1;
+                        __div = 1;
+                    }
+                    if (editfields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
                         html_fields += `</div>`;
+                        __check = 0;
+                        __div = 0;
                     }
+                    html_fields +=
+                        `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1' : ''}">`;
+                    html_fields +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
+                    html_fields += edit_field_html(editfields[i], login_user);
+
+                    // Handle child fields
+                    if (editfields[i]['module_meta_dependencies'] && editfields[i][
+                            'module_meta_dependencies'
+                        ].length > 0) {
+                        for (var j = 0; j < editfields[i]['module_meta_dependencies'].length; j++) {
+                            var childField = editfields[i]['module_meta_dependencies'][j];
+
+                            // Include data-parent and data-selected-values attributes
+                            let hideClass = childField.selected_values && childField.selected_values
+                                .length > 0 ? 'd-none' : '';
+                            html_fields +=
+                                `<div class="mb-3 dependent-field ${hideClass}" data-parent="${editfields[i]['option']}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
+                            html_fields +=
+                                `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
+                            html_fields += edit_field_html(childField, login_user, editfields[i].option);
+                            html_fields += `</div>`;
+                        }
+                    }
+
+                    html_fields += `</div>`;
                 }
 
-                html_fields += `</div>`;
-            }
-
-            // Add hidden fields for the form
-            html_field += `
+                // Add hidden fields for the form
+                html_field += `
                 <input type="hidden" name="table_name" value="${getParams('tb')}" />
                 <input type="hidden" name="id" class="edit_id" value="${id}" />
                 <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
@@ -1136,7 +1141,7 @@
                 <input type="hidden" name="_Verify_" value="0" />
                 <input type="hidden" name="hide__or__show" value="1" />
                 <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
-            html_fields += `
+                html_fields += `
                 <input type="hidden" name="table_name" value="${getParams('tb')}" />
                 <input type="hidden" name="id" class="edit_id" value="${id}" />
                 <input type="hidden" name="user__id" value="${getCookie('user_id')}" />
@@ -1146,54 +1151,54 @@
                 <input type="hidden" name="hide__or__show" value="1" />
                 <button type="submit" class="btn btn-primary" onclick="submitData(event)">Save</button>`;
 
-            // Handle Add or Edit case
-            if (id) {
-                // Setting up the edit modal
-                $('.append_field').html(html_fields);
-                $('.append_field button').text('Update');
-                $('.append_field button').attr('onclick', 'editData(event)');
-                // Initialize select2 within the edit modal
-                $('.edit select').select2({
-                    dropdownParent: $('.edit')
-                });
-                // Hide loaders
-                $('.threeDotLoder-edit').hide();
-                $('.threeDotLoder').hide();
-                // Set initial visibility of dependent fields
-                processFieldVisibility('#edit-model');
-            } else {
-                // Setting up the add modal
-                $('.append_fields').html(html_field);
-                // Initialize select2 within the add modal
-                $('.offcanvas select').select2({
-                    dropdownParent: $('.offcanvas')
-                });
-                // Hide loaders
-                $('.threeDotLoder-edit').hide();
-                $('.threeDotLoder').hide();
-                // Set initial visibility of dependent fields
-                processFieldVisibility('.offcanvas');
-            }
+                // Handle Add or Edit case
+                if (id) {
+                    // Setting up the edit modal
+                    $('.append_field').html(html_fields);
+                    $('.append_field button').text('Update');
+                    $('.append_field button').attr('onclick', 'editData(event)');
+                    // Initialize select2 within the edit modal
+                    $('.edit select').select2({
+                        dropdownParent: $('.edit')
+                    });
+                    // Hide loaders
+                    $('.threeDotLoder-edit').hide();
+                    $('.threeDotLoder').hide();
+                    // Set initial visibility of dependent fields
+                    processFieldVisibility('#edit-model');
+                } else {
+                    // Setting up the add modal
+                    $('.append_fields').html(html_field);
+                    // Initialize select2 within the add modal
+                    $('.offcanvas select').select2({
+                        dropdownParent: $('.offcanvas')
+                    });
+                    // Hide loaders
+                    $('.threeDotLoder-edit').hide();
+                    $('.threeDotLoder').hide();
+                    // Set initial visibility of dependent fields
+                    processFieldVisibility('.offcanvas');
+                }
 
-            // Handle the visibility of dependent fields based on the selection
-            handleFieldVisibility();
-            handleEditFieldVisibility();
-        },
-        error: function(response) {
-            loader(false);
-            if (response.status == 422) {
-                var errors = response.responseJSON.data;
-                $.each(errors, function(field, messages) {
-                    toastr.error(messages[0]);
-                });
-            } else if (response.status == 500) {
-                toastr.error("Something went wrong");
-            } else {
-                toastr.error(response.responseJSON.message);
+                // Handle the visibility of dependent fields based on the selection
+                handleFieldVisibility();
+                handleEditFieldVisibility();
+            },
+            error: function(response) {
+                loader(false);
+                if (response.status == 422) {
+                    var errors = response.responseJSON.data;
+                    $.each(errors, function(field, messages) {
+                        toastr.error(messages[0]);
+                    });
+                } else if (response.status == 500) {
+                    toastr.error("Something went wrong");
+                } else {
+                    toastr.error(response.responseJSON.message);
+                }
             }
-        }
-    });
-}
+        });
+    }
 
     function processFieldVisibility(modalSelector) {
         // Loop through select, checkbox, and radio inputs
