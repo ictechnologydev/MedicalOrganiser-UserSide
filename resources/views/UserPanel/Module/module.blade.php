@@ -282,11 +282,23 @@
         } else if (field['store_value']) {
             value = String(field['store_value']).trim();
         }
-        if (field['store_value']) {
-            selected_value = String(field['store_value']).trim();
-        } else if (field['child_store_value'] && field['child_store_value']['value']) {
-            selected_value = String(field['child_store_value']['value']).trim();
+
+        function getFieldValue(field) {
+            if (field['child_store_value'] && field['child_store_value']['value']) {
+                return String(field['child_store_value']['value']).trim();
+            } else if (field['store_value']) {
+                return String(field['store_value']).trim();
+            } else if (field['value']) {
+                return String(field['value']).trim();
+            } else if (field['store_values'] && field['store_values'].length > 0) {
+                return String(field['store_values'][0]['value']).trim();
+            } else {
+                return '';
+            }
         }
+
+        // Get the stored value for the field
+        var storedValue = getFieldValue(field)
 
         // Construct the field name, considering parent field if applicable
         var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
@@ -332,17 +344,9 @@
         `;
             });
         }
-
         if (field['type'] === 'checkbox') {
-            var selectedValues = [];
-
-            // Determine the value to be used for pre-selecting options
-            if (field['child_store_value'] && field['child_store_value']['value']) {
-                selectedValues = field['child_store_value']['value'].split(',').map(v => v.trim());
-            } else if (field['store_value']) {
-                selectedValues = field['store_value'].split(',').map(v => v.trim());
-            }
             var value_list = field['comma_separated_values'];
+
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
@@ -361,8 +365,8 @@
             var value_list = field['comma_separated_values'];
 
             html_field += `
-            <select class="form-control" id="${fieldName}" name="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''}>
-                <option value="">Select value</option>
+        <select class="form-control" id="${fieldName}" name="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''}>
+            <option value="">Select value</option>
         `;
 
             value_list.forEach(item => {
@@ -370,17 +374,10 @@
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
                 // Determine if this option should be selected
-                var isSelected = false;
-                if (field['child_store_value'] && field['child_store_value']['value']) {
-                    // For child dropdowns, compare with 'value'
-                    isSelected = value === optionValue;
-                } else {
-                    // For main dropdowns, compare with 'label'
-                    isSelected = value === optionLabel;
-                }
+                var isSelected = (storedValue === optionValue || storedValue === optionLabel);
 
                 html_field += `
-                <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
             `;
             });
 
@@ -391,35 +388,36 @@
             var value_list = field['comma_separated_values'];
 
             html_field += `
-            <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
-                <option value="">Select value</option>
+        <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
+            <option value="">Select value</option>
         `;
 
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
-                var isSelected = value === optionLabel;
+                // Check if this option should be selected
+                var isSelected = storedValue === optionLabel;
 
                 html_field += `
-                <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
             `;
             });
 
             html_field += `</select>`;
         }
 
+        // Multiselect handling
         if (field['type'] === 'multiselect') {
             var value_list = field['comma_separated_values'];
             var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
-                field['child_store_value']['value'].split(',').map(v => v.trim()) // Handle child selected values
-                :
+                field['child_store_value']['value'].split(',').map(v => v.trim()) :
                 field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
 
             html_field += `
-    <select class="form-control" id="${fieldName}" name="${fieldName}[]" data-placeholder="Please select values" multiple>
-        <option value="">Select value</option>
-    `;
+        <select class="form-control" id="${fieldName}" name="${fieldName}[]" data-placeholder="Please select values" multiple>
+            <option value="">Select value</option>
+        `;
 
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
@@ -429,32 +427,32 @@
                 var isSelected = selectedValues.includes(optionValue);
 
                 html_field += `
-        <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
-    `;
+            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
+            `;
             });
 
             html_field += `</select>`;
         }
 
-
+        // Multi-label dropdown handling
         if (field['type'] === 'multi_label_dropdown') {
             var value_list = field['comma_separated_values'];
 
             html_field += `
         <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
             <option value="">Select value</option>
-    `;
+        `;
 
             value_list.forEach(item => {
-                var optionValue = String(item['value']).trim(); // Correct value to be used
+                var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
                 // Determine if this option should be selected
-                var isSelected = value === optionValue; // Compare value with optionValue for main dropdown
+                var isSelected = storedValue === optionValue;
 
                 html_field += `
             <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
-        `;
+            `;
             });
 
             html_field += `</select>`;
