@@ -9,11 +9,18 @@
 
     }
 }
+.sidebar-scroll{
+  height: 73vh;
+  min-height: 73vh;
+  overflow-y: auto;
+}
 
 
 </style>
-<ul class="nav nav-pills nav-flush flex-column mb-auto text-center append_module_image">
-</ul>
+<div class="sidebar-scroll">
+  <ul class="nav nav-pills nav-flush flex-column mb-auto text-center append_module_image">
+    </ul>
+</div>
 <script>
   function fetch_all_images()
         {
