@@ -114,7 +114,8 @@
 </div>
 <div id="dynamic-form-container">
     <!-- Modal -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" style="width: 500px !important;">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel"
+        style="width: 500px !important;">
         <div class="offcanvas-header">
             <h4 id="offcanvasRightLabel"><small id="add_name"></small></h4>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -172,7 +173,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="reason-model" tabindex="-1" aria-labelledby="reason-modelLabel" aria-hidden="true">
+    <div class="modal fade" id="reason-model" tabindex="-1" aria-labelledby="reason-modelLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -271,176 +273,148 @@
     });
 
     function edit_field_html(field, login_user, parentFieldName = null) {
-    var html_field = ``;
-    var value = '';
+        var html_field = ``;
+        var value = '';
 
-    // Determine the value to be used for pre-selecting options
-    if (field['child_store_value'] && field['child_store_value']['value']) {
-        value = String(field['child_store_value']['value']).trim();
-    } else if (field['value']) {
-        value = String(field['value']).trim();
-    } else if (field['store_value']) {
-        value = String(field['store_value']).trim();
-    }
+        // Determine the value to be used for pre-selecting options
+        if (field['child_store_value'] && field['child_store_value']['value']) {
+            value = String(field['child_store_value']['value']).trim();
+        } else if (field['value']) {
+            value = String(field['value']).trim();
+        } else if (field['store_value']) {
+            value = String(field['store_value']).trim();
+        }
 
-    // Construct the field name, considering parent field if applicable
-    var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
+        // Construct the field name, considering parent field if applicable
+        var fieldName = parentFieldName ? `${parentFieldName}-${field['option']}` : field['option'];
 
-    // Input types handling
-    if (field['type'] === 'text') {
-        html_field += `<input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
-    } else if (field['type'] === 'number') {
-        html_field += `<input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
-    } else if (field['type'] === 'email') {
-        html_field += `<input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
-    } else if (field['type'] === 'image') {
-        html_field += `<input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
-    } else if (field['type'] === 'datepicker') {
-        html_field += `<input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${value ? convertDateFormat(value) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
-    } else if (field['type'] === 'radio') {
-        field['comma_separated_values'].forEach((item, i) => {
-            var optionValue = String(item['value']).trim();
-            var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
-            var isChecked = (value === optionValue) || (i === 0 && !value);
+        // Input types handling
+        if (field['type'] === 'text') {
+            html_field +=
+                `<input type="text" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
+        } else if (field['type'] === 'number') {
+            html_field +=
+                `<input type="number" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
+        } else if (field['type'] === 'email') {
+            html_field +=
+                `<input type="email" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
+        } else if (field['type'] === 'image') {
+            html_field +=
+                `<input type="file" class="form-control" id="${fieldName}" name="${fieldName}" value="${value}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
+        } else if (field['type'] === 'datepicker') {
+            html_field +=
+                `<input type="date" class="form-control" id="${fieldName}" name="${fieldName}" value="${value ? convertDateFormat(value) : getCurrentDate()}" placeholder="${capitalizeFirstLetter(field['option'])}">`;
+        } else if (field['type'] === 'radio') {
+            field['comma_separated_values'].forEach((item, i) => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+                var isChecked = (value === optionValue) || (i === 0 && !value);
 
-            html_field += `
+                html_field += `
             <div class="form-check">
                 <input class="form-check-input" type="radio" id="${fieldName}-${item['value']}" name="${fieldName}" value="${optionValue}" ${isChecked ? 'checked' : ''}>
                 <label class="form-check-label" for="${fieldName}-${item['value']}" style="text-transform: capitalize;">${optionLabel}</label>
             </div>
             `;
-        });
-    } else if (field['type'] === 'checkbox') {
-        var selectedValues = [];
-        if (field['child_store_value'] && field['child_store_value']['value']) {
-            selectedValues = field['child_store_value']['value'].split(',').map(v => v.trim());
-        } else if (field['store_value']) {
-            selectedValues = field['store_value'].split(',').map(v => v.trim());
-        }
-        var value_list = field['comma_separated_values'];
-        value_list.forEach(item => {
-            var optionValue = String(item['value']).trim();
-            var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
-            var isChecked = selectedValues.includes(optionValue);
+            });
+        } else if (field['type'] === 'checkbox') {
+            var selectedValues = [];
+            if (field['child_store_value'] && field['child_store_value']['value']) {
+                selectedValues = field['child_store_value']['value'].split(',').map(v => v.trim());
+            } else if (field['store_value']) {
+                selectedValues = field['store_value'].split(',').map(v => v.trim());
+            }
+            var value_list = field['comma_separated_values'];
+            value_list.forEach(item => {
+                var optionValue = String(item['value']).trim();
+                var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+                var isChecked = selectedValues.includes(optionValue);
 
-            html_field += `
+                html_field += `
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="${fieldName}[]" value="${optionValue}" ${isChecked ? 'checked' : ''}>
                 <label class="form-check-label" style="text-transform: capitalize;">${optionLabel}</label>
             </div>
             `;
-        });
-    } else if (field['type'] === 'dropdown') {
-        var value_list = field['comma_separated_values'];
-
-        html_field += `<select class="form-control" id="${fieldName}" name="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''}>`;
-        html_field += `<option value="">Select value</option>`;
-
-        value_list.forEach(item => {
-            var optionValue = String(item['value']).trim();
-            var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
-            var isSelected = value === optionLabel;
-
-            html_field += `<option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>`;
-        });
-
-        html_field += `</select>`;
-    } else if (field['type'] === 'multi_layer_inline_dropdown') {
-        var value_list = field['comma_separated_values'];
-
-        html_field += `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
-        html_field += `<option value="">Select value</option>`;
-
-        for (var i = 0; i < value_list.length; i++) {
-            var isSelected = value && value.trim() === value_list[i]['label'].trim();
-            html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
-        }
-
-        html_field += `</select>`;
-    } else if (field['type'] === 'multiselect') {
-        var value_list = field['comma_separated_values'];
-        var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
-            field['child_store_value']['value'].split(',').map(v => v.trim()) :
-            field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
-
-        html_field += `<select class="form-control" id="${fieldName}" name="${fieldName}[]" data-placeholder="Please select values" multiple>`;
-        html_field += `<option value="">Select value</option>`;
-
-        value_list.forEach(item => {
-            var optionValue = String(item['value']).trim();
-            var optionLabel = item['label'] ? String(item['label']).trim() : '';
-            var isSelected = selectedValues.includes(optionValue);
-
-            html_field += `<option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>`;
-        });
-
-        html_field += `</select>`;
-        
-        // Handle module_meta_dependencies for multiselect
-        if (field.module_meta_dependencies && field.module_meta_dependencies.length > 0) {
-            html_field += `<div class="child-fields-container">`; // Wrap child fields in a parent div
-            for (var j = 0; j < field.module_meta_dependencies.length; j++) {
-                var childField = field.module_meta_dependencies[j];
-
-                // Include data-parent and data-selected-values attributes
-                let hideClass = childField.selected_values && childField.selected_values.length > 0 ? 'd-none' : '';
-                html_field += `<div class="mb-3 dependent-field ${hideClass}" data-parent="${field.option}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
-                html_field += `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
-                html_field += edit_field_html(childField, login_user, field.option); // Recursive call to edit_field_html for child fields
-                html_field += `</div>`;
-            }
-            html_field += `</div>`; // Close the parent div for child fields
-        }
-
-        if (field['type'] === 'multi_layer_inline_dropdown') {
+            });
+        } else if (field['type'] === 'dropdown') {
             var value_list = field['comma_separated_values'];
 
-            html_field += `
-        <select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">
-            <option value="">Select value</option>
-        `;
+            html_field +=
+                `<select class="form-control" id="${fieldName}" name="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''}>`;
+            html_field += `<option value="">Select value</option>`;
 
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
+                var isSelected = value === optionLabel;
 
-                // Check if this option should be selected
-                var isSelected = storedValue === optionLabel;
-
-                html_field += `
-            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
-            `;
+                html_field +=
+                    `<option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>`;
             });
 
             html_field += `</select>`;
-        }
+        } else if (field['type'] === 'multi_layer_inline_dropdown') {
+            var value_list = field['comma_separated_values'];
 
-        // Multiselect handling
-        if (field['type'] === 'multiselect') {
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+            html_field += `<option value="">Select value</option>`;
+
+            for (var i = 0; i < value_list.length; i++) {
+                var optionValue = String(value_list[i]['value']).trim();
+                var optionLabel = field['comma_separated_values'][i]['label'] ? String(field['comma_separated_values'][
+                    i
+                ]['label']).trim().replace(/_/g, ' ') : '';
+                var isSelected = value && value.trim() === optionValue; // Corrected comparison
+
+                html_field +=
+                    `<option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>`;
+            }
+
+            html_field += `</select>`;
+        } else if (field['type'] === 'multiselect') {
             var value_list = field['comma_separated_values'];
             var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
                 field['child_store_value']['value'].split(',').map(v => v.trim()) :
                 field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
 
-            html_field += `
-        <select class="form-control" id="${fieldName}" name="${fieldName}[]" data-placeholder="Please select values" multiple>
-            <option value="">Select value</option>
-        `;
+            html_field +=
+                `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`;
+            html_field += `<option value="">Select value</option>`;
 
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim() : '';
-
-                // Check if this option is part of the selected values
                 var isSelected = selectedValues.includes(optionValue);
 
-                html_field += `
-            <option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>
-            `;
+                html_field +=
+                    `<option value="${optionValue}" ${isSelected ? 'selected' : ''}>${optionLabel}</option>`;
             });
 
             html_field += `</select>`;
+
+            // // Handle module_meta_dependencies for multiselect
+            // if (field.module_meta_dependencies && field.module_meta_dependencies.length > 0) {
+            //     html_field += `<div class="child-fields-container">`; // Wrap child fields in a parent div
+            //     for (var j = 0; j < field.module_meta_dependencies.length; j++) {
+            //         var childField = field.module_meta_dependencies[j];
+
+            //         // Include data-parent and data-selected-values attributes
+            //         let hideClass = childField.selected_values && childField.selected_values.length > 0 ? 'd-none' : '';
+            //         html_field +=
+            //             `<div class="mb-3 dependent-field ${hideClass}" data-parent="${field.option}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
+            //         html_field +=
+            //             `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
+            //         html_field += edit_field_html(childField, login_user, field
+            //         .option); // Recursive call to edit_field_html for child fields
+            //         html_field += `</div>`;
+            //     }
+            //     html_field += `</div>`; // Close the parent div for child fields
+            // }
         }
+
+
 
         // Multi-label dropdown handling
         if (field['type'] === 'multi_label_dropdown') {
@@ -473,10 +447,8 @@
         }
 
         return html_field;
-    }
 
-    return html_field;
-}
+    }
 
 
     function create_field_html(field, login_user, parentFieldName = null) {
@@ -535,29 +507,35 @@
             }
         } else if (field['type'] == 'dropdown') {
             var value_list = field['comma_separated_values'];
-            html_field += `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
+            html_field +=
+                `<select class="form-control" id="${fieldName}" ${field['option'] === 'medication' ? 'onchange="medicationOnChange()"' : ''} name="${fieldName}">`;
             html_field += `<option value="">Select value</option>`;
             for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
             html_field += `</select>`;
         } else if (field['type'] == 'multi_layer_inline_dropdown') {
             var value_list = field['comma_separated_values'];
-            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+            html_field +=
+                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
             html_field += `<option value="">Select value</option>`;
             for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
             html_field += `</select>`;
         } else if (field['type'] == 'multiselect') {
             var value_list = field['comma_separated_values'];
-            html_field += `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`;
+            html_field +=
+                `<select class="form-control" id="${fieldName}" name="${fieldName}" data-placeholder="Please select values" multiple>`;
             html_field += `<option value="">Select value</option>`;
             for (var i = 0; i < value_list.length; i++) {
                 var isChecked = field['store_value'] && field['store_value'].includes(value_list[i]['label'].trim());
-                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
+                html_field +=
+                    `<option value="${String(value_list[i]['value']).trim()}" ${isChecked ? 'selected' : ''}>${value_list[i]['label'].trim()}</option>`;
             }
             html_field += `</select>`;
 
@@ -569,15 +547,19 @@
 
                     // Include data-parent and data-selected-values attributes
                     let hideClass = childField.selected_values && childField.selected_values.length > 0 ? 'd-none' : '';
-                    html_field += `<div class="mb-3 dependent-field ${hideClass}" data-parent="${field.option}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
-                    html_field += `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
-                    html_field += create_field_html(childField, login_user, field.option); // Recursive call to create_field_html for child fields
+                    html_field +=
+                        `<div class="mb-3 dependent-field ${hideClass}" data-parent="${field.option}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
+                    html_field +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
+                    html_field += create_field_html(childField, login_user, field
+                        .option); // Recursive call to create_field_html for child fields
                     html_field += `</div>`;
                 }
                 html_field += `</div>`; // Close the parent div for child fields
             }
         } else if (field['type'] == 'textarea') {
-            html_field += `<textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${field['store_value'] ? field['store_value'] : ''}</textarea>`;
+            html_field +=
+                `<textarea class="form-control" id="${fieldName}" name="${fieldName}" placeholder="${capitalizeFirstLetter(field['option'])}">${field['store_value'] ? field['store_value'] : ''}</textarea>`;
         }
 
         return html_field;
@@ -1017,13 +999,15 @@
 
                         // Main field creation
                         html_field += `<div class="mb-3 col-md-12 col-sm-12 me-1">`;
-                        html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+                        html_field +=
+                            `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
                         // Main field HTML
                         html_field += create_field_html(fields[i], login_user);
 
                         // Handle dependent fields (module_meta_dependencies)
-                        if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length > 0) {
+                        if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies
+                            .length > 0) {
                             // Create a container for child fields
                             html_field += `<div class="row">`; // Start a row for child fields
 
@@ -1031,14 +1015,18 @@
                                 let dependencyField = fields[i].module_meta_dependencies[dep];
 
                                 // Initially hide dependent fields with selected_values
-                                let hideClass = dependencyField.selected_values && dependencyField.selected_values.length > 0 ? 'd-none' : '';
+                                let hideClass = dependencyField.selected_values && dependencyField
+                                    .selected_values.length > 0 ? 'd-none' : '';
 
                                 // Create a column for each child field
-                                html_field += `<div class="col-md-6 mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
-                                html_field += `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
+                                html_field +=
+                                    `<div class="col-md-6 mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                                html_field +=
+                                    `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
 
                                 // Add the dependent field HTML
-                                html_field += create_field_html(dependencyField, login_user, fields[i].option);
+                                html_field += create_field_html(dependencyField, login_user, fields[i]
+                                    .option);
                                 html_field += `</div>`; // Close column div
 
                                 // Close the row after every three columns
@@ -1056,7 +1044,8 @@
                     } else {
                         // Handle other field types normally without affecting layout
                         html_field += `<div class="mb-3">`;
-                        html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+                        html_field +=
+                            `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
                         html_field += create_field_html(fields[i], login_user);
                         html_field += `</div>`;
                     }
@@ -1088,22 +1077,43 @@
                         __check = 0;
                         __div = 0;
                     }
-                    html_fields += `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-12 col-sm-4 me-4' : ''}">`;
-                    html_fields += `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
+                    html_fields +=
+                        `<div class="mb-3 ${editfields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-12 col-sm-4 me-4' : ''}">`;
+                    html_fields +=
+                        `<label class="mb-1" style="text-transform:capitalize;">${editfields[i]['option'].replace(/_/g, ' ')}</label>`;
                     html_fields += edit_field_html(editfields[i], login_user);
 
                     // Handle child fields
-                    if (editfields[i]['module_meta_dependencies'] && editfields[i]['module_meta_dependencies'].length > 0) {
-                        // Add a parent div to wrap the child fields
-                        html_fields += `<div class="child-fields-container row">`; // New parent div
+                    if (editfields[i]['module_meta_dependencies'] && editfields[i][
+                            'module_meta_dependencies'
+                        ].length > 0) {
+                        // Check if the main field type is 'multi_layer_inline_dropdown'
+                        let isMultiLayerInlineDropdown = editfields[i]['type'] ===
+                            'multi_layer_inline_dropdown';
+
+                        // If the main field is of type 'multi_layer_inline_dropdown', add 'row' class
+                        let parentDivClass = isMultiLayerInlineDropdown ? 'child-fields-container row' :
+                            'child-fields-container';
+                        html_fields += `<div class="${parentDivClass}">`; // New parent div
 
                         for (var j = 0; j < editfields[i]['module_meta_dependencies'].length; j++) {
                             var childField = editfields[i]['module_meta_dependencies'][j];
 
                             // Include data-parent and data-selected-values attributes
-                            let hideClass = childField.selected_values && childField.selected_values.length > 0 ? 'd-none' : '';
-                            html_fields += `<div class="mb-3 dependent-field col-md-6 ${hideClass}" data-parent="${editfields[i]['option']}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
-                            html_fields += `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
+                            let hideClass = childField.selected_values && childField.selected_values
+                                .length > 0 ? 'd-none' : '';
+
+                            // If main field is 'multi_layer_inline_dropdown', add 'col-md-6' class to child divs
+                            let childDivClass = 'mb-3 dependent-field';
+                            if (isMultiLayerInlineDropdown) {
+                                childDivClass += ' col-md-6';
+                            }
+                            childDivClass += ` ${hideClass}`;
+
+                            html_fields +=
+                                `<div class="${childDivClass}" data-parent="${editfields[i]['option']}" data-selected-values='${JSON.stringify(childField.selected_values)}'>`;
+                            html_fields +=
+                                `<label class="mb-1" style="text-transform:capitalize;">${childField['option'].replace(/_/g, ' ')}</label>`;
                             html_fields += edit_field_html(childField, login_user, editfields[i].option);
                             html_fields += `</div>`;
                         }
