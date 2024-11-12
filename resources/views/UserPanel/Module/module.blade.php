@@ -1036,21 +1036,24 @@
 
                 // Loop through the fields for the add modal
                 for (let i = 0; i < fields.length; i++) {
-                    if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
-                        html_field += `<div class="d-flex">`;
-                        __check = 1;
-                        __div = 1;
+                    if (fields[i]['type'] == 'multi_layer_inline_dropdown') {
+                        // Start a new flex container for multi-layer inline dropdown
+                        if (__check == 0) {
+                            html_field += `<div class="d-flex flex-wrap">`;
+                            __check = 1;
+                            __div = 1;
+                        }
                     }
 
-                    if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
-                        html_field += `</div>`;
-                        __check = 0;
-                        __div = 0;
-                    }
+                    // if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
+                    //     html_field += `</div>`;
+                    //     __check = 0;
+                    //     __div = 0;
+                    // }
 
                     // Main field creation
-                    html_field +=
-                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
+                    html_field += `<div class="mb-3 col-md-12 col-sm-12 me-1">`;
+
                     html_field +=
                         `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
@@ -1060,23 +1063,34 @@
                     // Handle dependent fields (module_meta_dependencies)
                     if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
                         0) {
-                        for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
-                            let dependencyField = fields[i].module_meta_dependencies[dep];
+                            html_field += `<div class="row mb-3">`; // Start a row for child fields
 
-                            // Initially hide dependent fields with selected_values
-                            let hideClass = dependencyField.selected_values && dependencyField
-                                .selected_values.length > 0 ? 'd-none' : '';
-
-                            html_field +=
+                            for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
+                                let dependencyField = fields[i].module_meta_dependencies[dep];
+                                // Initially hide dependent fields with selected_values
+                                let hideClass = dependencyField.selected_values && dependencyField
+                                    .selected_values.length > 0 ? 'd-none' : '';
+                                // Create a column for each child field
+                                if (fields[i]['type'] == 'multi_layer_inline_dropdown') {
+                                html_field +=
+                                    `<div class="col-md-6 mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                                    }else{
+                                        html_field +=
                                 `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
-                            html_field +=
-                                `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
+                            
+                                    }
 
-                            // Add the dependent field HTML
-                            html_field += create_field_html(dependencyField, login_user, fields[i].option);
-
-                            html_field += `</div>`;
-                        }
+                                        html_field +=
+                                    `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
+                                // Add the dependent field HTML
+                                html_field += create_field_html(dependencyField, login_user, fields[i]
+                                    .option);
+                                html_field += `</div>`; // Close column div
+                                // Close the row after every three columns
+                                // if ((dep + 1) % 3 === 0 && (dep + 1) < fields[i].module_meta_dependencies.length) {
+                                //     html_field += `</div><div class="row">`; // Close current row and start a new one if there are more fields
+                                // }
+                            }
                     }
 
                     html_field += `</div>`;
