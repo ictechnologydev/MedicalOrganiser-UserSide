@@ -367,7 +367,7 @@ function showJsonDetail(id,_entryId,updated,_actionId) {
             
         }
 
-        html +=`<tr><td style="text-transform: capitalize;">Chagnes By</td><td>${_actionId}</td></tr>`;
+        html +=`<tr><td style="text-transform: capitalize;">Changes By</td><td>${_actionId}</td></tr>`;
 
     $('.json_value_body').html(html);
     

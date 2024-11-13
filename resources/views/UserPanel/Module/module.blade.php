@@ -109,7 +109,6 @@
                     margin-top: 10px;
                 }
             }
-            
         </style>
     </div>
 </div>
@@ -330,12 +329,15 @@
         `;
         }
         if (field['type'] === 'radio') {
+            var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
+                field['child_store_value']['value'].split(',').map(v => v.trim()) :
+                field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
             field['comma_separated_values'].forEach((item, i) => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
 
                 // Determine if this radio button should be checked
-                var isChecked = (selected_value === optionValue) || (i === 0 && !selected_value);
+                var isChecked = selectedValues.includes(optionValue); // Check against the selected values
 
                 html_field += `
             <div class="form-check">
@@ -347,7 +349,9 @@
         }
         if (field['type'] === 'checkbox') {
             var value_list = field['comma_separated_values'];
-
+            var selectedValues = field['child_store_value'] && field['child_store_value']['value'] ?
+                field['child_store_value']['value'].split(',').map(v => v.trim()) :
+                field['store_value'] ? field['store_value'].split(',').map(v => v.trim()) : [];
             value_list.forEach(item => {
                 var optionValue = String(item['value']).trim();
                 var optionLabel = item['label'] ? String(item['label']).trim().replace(/_/g, ' ') : '';
@@ -893,13 +897,21 @@
             var fieldValue = $(this).val();
             if (fieldName) {
                 if ($(this).attr('type') == 'checkbox') {
-                    // Initialize an array for checkbox values if it doesn't exist
-                    if (!formData.has(fieldName)) {
-                        formData.append(fieldName, []); // Initialize as an array
-                    }
+                    var checkboxValues = formData.getAll(
+                        fieldName);
+
                     if ($(this).is(':checked')) {
-                        formData.append(fieldName, $(this).val()); // Append checked value to the array
+                        if (!checkboxValues.includes($(this).val())) {
+                            checkboxValues.push($(this).val());
+                        }
+                    } else {
+                        checkboxValues = checkboxValues.filter(value => value !== $(this).val());
                     }
+
+                    formData.delete(fieldName);
+                    checkboxValues.forEach(value => {
+                        formData.append(fieldName, value);
+                    });
                 } else if ($(this).attr('type') == 'radio') {
                     if ($(this).is(':checked')) {
                         formData.set(fieldName, fieldValue);
@@ -1052,28 +1064,40 @@
                     html_field += `<div class="mb-3 col-md-12 col-sm-12 me-1">`;
                     html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
+
                     // Main field HTML
                     html_field += create_field_html(fields[i], login_user);
 
                     // Handle dependent fields (module_meta_dependencies)
                     if (fields[i].module_meta_dependencies && fields[i].module_meta_dependencies.length >
                         0) {
+                        html_field += `<div class="row mb-3">`; // Start a row for child fields
+
                         for (let dep = 0; dep < fields[i].module_meta_dependencies.length; dep++) {
                             let dependencyField = fields[i].module_meta_dependencies[dep];
-
                             // Initially hide dependent fields with selected_values
                             let hideClass = dependencyField.selected_values && dependencyField
                                 .selected_values.length > 0 ? 'd-none' : '';
+                            // Create a column for each child field
+                            if (fields[i]['type'] == 'multi_layer_inline_dropdown') {
+                                html_field +=
+                                    `<div class="col-md-6 mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                            } else {
+                                html_field +=
+                                    `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
 
-                            html_field +=
-                                `<div class="mb-3 dependent-field ${hideClass}" data-parent="${fields[i]['option']}" data-selected-values='${JSON.stringify(dependencyField.selected_values)}'>`;
+                            }
+
                             html_field +=
                                 `<label class="mb-1" style="text-transform:capitalize;">${dependencyField.option.replace(/_/g, ' ')}</label>`;
-
                             // Add the dependent field HTML
-                            html_field += create_field_html(dependencyField, login_user, fields[i].option);
-
-                            html_field += `</div>`;
+                            html_field += create_field_html(dependencyField, login_user, fields[i]
+                                .option);
+                            html_field += `</div>`; // Close column div
+                            // Close the row after every three columns
+                            // if ((dep + 1) % 3 === 0 && (dep + 1) < fields[i].module_meta_dependencies.length) {
+                            //     html_field += `</div><div class="row">`; // Close current row and start a new one if there are more fields
+                            // }
                         }
                     }
 
@@ -1216,41 +1240,44 @@
     }
 
     function processFieldVisibility(modalSelector) {
-        // Loop through select, checkbox, and radio inputs
         $(modalSelector + ' select, ' + modalSelector + ' input[type="checkbox"], ' + modalSelector +
             ' input[type="radio"]').each(function() {
-            var selectedValues = [];
+            let selectedValues = [];
+            const nameAttr = $(this).attr('name');
+            const nameWithoutBrackets = nameAttr.replace(/\[\]/g, ""); // Remove [] for matching
+
             if ($(this).is('select')) {
                 selectedValues = $(this).val();
             } else if ($(this).is('input[type="checkbox"]')) {
-                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
-                    selectedValues.push($(this).val());
-                });
-            } else if ($(this).is('input[type="radio"]')) {
-                if ($(this).is(':checked')) {
-                    selectedValues.push($(this).val());
-                }
+                $('input[name="' + nameAttr.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + '"]:checked').each(
+                    function() {
+                        selectedValues.push($(this).val());
+                    });
+            } else if ($(this).is('input[type="radio"]') && $(this).is(':checked')) {
+                selectedValues.push($(this).val());
             }
-            var parentField = $(this).attr('name');
+
             if (!Array.isArray(selectedValues)) {
                 selectedValues = [selectedValues];
             }
-            // Now, process the dependent fields
+
             $(modalSelector + ' .dependent-field').each(function() {
-                var parent = $(this).data('parent');
-                var selectedValuesForChild = $(this).data('selected-values');
-                if (parent === parentField) {
-                    var shouldShow = false;
+                const parent = $(this).data('parent');
+                const selectedValuesForChild = $(this).data('selected-values');
+
+                if (parent === nameWithoutBrackets) {
+                    let shouldShow = false;
                     if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                        shouldShow = selectedValues.some(function(val) {
-                            return selectedValuesForChild.some(function(childVal) {
-                                return String(childVal.value).trim().toLowerCase() ===
-                                    String(val).trim().toLowerCase();
-                            });
-                        });
+                        shouldShow = selectedValues.some(val =>
+                            selectedValuesForChild.some(childVal =>
+                                String(childVal.value).trim().toLowerCase() === String(val).trim()
+                                .toLowerCase()
+                            )
+                        );
                     } else {
                         shouldShow = true;
                     }
+
                     if (shouldShow) {
                         $(this).removeClass('d-none');
                     } else {
@@ -1337,45 +1364,43 @@
 
 
     function handleEditFieldVisibility() {
-        // Apply changes on select, checkbox, and radio inputs within the edit modal
         $('#edit-model').on('change', 'select, input[type="checkbox"], input[type="radio"]', function() {
-            var selectedValues = [];
+            let selectedValues = [];
+            const nameAttr = $(this).attr('name');
+            const nameWithoutBrackets = nameAttr.replace(/\[\]/g, ""); // Remove [] for matching
 
             if ($(this).is('select')) {
                 selectedValues = $(this).val();
             } else if ($(this).is('input[type="checkbox"]')) {
-                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
-                    selectedValues.push($(this).val());
-                });
-            } else if ($(this).is('input[type="radio"]')) {
-                if ($(this).is(':checked')) {
-                    selectedValues.push($(this).val());
-                }
+                $('input[name="' + nameAttr.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + '"]:checked').each(
+                    function() {
+                        selectedValues.push($(this).val());
+                    });
+            } else if ($(this).is('input[type="radio"]') && $(this).is(':checked')) {
+                selectedValues.push($(this).val());
             }
-
-            var parentField = $(this).attr('name');
 
             if (!Array.isArray(selectedValues)) {
                 selectedValues = [selectedValues];
             }
 
-            // Loop through dependent fields and show/hide based on selected values
             $('#edit-model .dependent-field').each(function() {
-                var parent = $(this).data('parent');
-                var selectedValuesForChild = $(this).data('selected-values');
+                const parent = $(this).data('parent');
+                const selectedValuesForChild = $(this).data('selected-values');
 
-                if (parent === parentField) {
-                    var shouldShow = false;
+                if (parent === nameWithoutBrackets) {
+                    let shouldShow = false;
                     if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                        shouldShow = selectedValues.some(function(val) {
-                            return selectedValuesForChild.some(function(childVal) {
-                                return String(childVal.value).trim().toLowerCase() ===
-                                    String(val).trim().toLowerCase();
-                            });
-                        });
+                        shouldShow = selectedValues.some(val =>
+                            selectedValuesForChild.some(childVal =>
+                                String(childVal.value).trim().toLowerCase() === String(val).trim()
+                                .toLowerCase()
+                            )
+                        );
                     } else {
                         shouldShow = true;
                     }
+
                     if (shouldShow) {
                         $(this).removeClass('d-none');
                     } else {
@@ -1391,23 +1416,6 @@
     $(document).ready(function() {
         handleEditFieldVisibility(); // For the edit modal
     });
-
-
-
-    // Call this function once the modal is fully loaded or when dynamically adding fields
-    $(document).ready(function() {
-        handleEditFieldVisibility();
-    });
-
-
-
-
-
-
-
-
-
-
 
     function verify_by(user_id) {
         loader(true);
@@ -1470,7 +1478,5 @@
     }
 </style>
 @include('UserPanel.Includes.footer')
-ght: 40px !important; */
-}
 </style>
 @include('UserPanel.Includes.footer')
