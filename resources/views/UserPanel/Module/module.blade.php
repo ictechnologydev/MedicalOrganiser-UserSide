@@ -901,11 +901,11 @@
             if (fieldName) {
                 if ($(this).attr('type') == 'checkbox') {
                     var checkboxValues = formData.getAll(
-                    fieldName); 
+                        fieldName);
 
                     if ($(this).is(':checked')) {
-                        if (!checkboxValues.includes($(this).val())) { 
-                            checkboxValues.push($(this).val()); 
+                        if (!checkboxValues.includes($(this).val())) {
+                            checkboxValues.push($(this).val());
                         }
                     } else {
                         checkboxValues = checkboxValues.filter(value => value !== $(this).val());
@@ -913,7 +913,7 @@
 
                     formData.delete(fieldName);
                     checkboxValues.forEach(value => {
-                        formData.append(fieldName, value); 
+                        formData.append(fieldName, value);
                     });
                 } else if ($(this).attr('type') == 'radio') {
                     if ($(this).is(':checked')) {
@@ -1244,41 +1244,44 @@
     }
 
     function processFieldVisibility(modalSelector) {
-        // Loop through select, checkbox, and radio inputs
         $(modalSelector + ' select, ' + modalSelector + ' input[type="checkbox"], ' + modalSelector +
             ' input[type="radio"]').each(function() {
-            var selectedValues = [];
+            let selectedValues = [];
+            const nameAttr = $(this).attr('name');
+            const nameWithoutBrackets = nameAttr.replace(/\[\]/g, ""); // Remove [] for matching
+
             if ($(this).is('select')) {
                 selectedValues = $(this).val();
             } else if ($(this).is('input[type="checkbox"]')) {
-                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
-                    selectedValues.push($(this).val());
-                });
-            } else if ($(this).is('input[type="radio"]')) {
-                if ($(this).is(':checked')) {
-                    selectedValues.push($(this).val());
-                }
+                $('input[name="' + nameAttr.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + '"]:checked').each(
+                    function() {
+                        selectedValues.push($(this).val());
+                    });
+            } else if ($(this).is('input[type="radio"]') && $(this).is(':checked')) {
+                selectedValues.push($(this).val());
             }
-            var parentField = $(this).attr('name');
+
             if (!Array.isArray(selectedValues)) {
                 selectedValues = [selectedValues];
             }
-            // Now, process the dependent fields
+
             $(modalSelector + ' .dependent-field').each(function() {
-                var parent = $(this).data('parent');
-                var selectedValuesForChild = $(this).data('selected-values');
-                if (parent === parentField) {
-                    var shouldShow = false;
+                const parent = $(this).data('parent');
+                const selectedValuesForChild = $(this).data('selected-values');
+
+                if (parent === nameWithoutBrackets) {
+                    let shouldShow = false;
                     if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                        shouldShow = selectedValues.some(function(val) {
-                            return selectedValuesForChild.some(function(childVal) {
-                                return String(childVal.value).trim().toLowerCase() ===
-                                    String(val).trim().toLowerCase();
-                            });
-                        });
+                        shouldShow = selectedValues.some(val =>
+                            selectedValuesForChild.some(childVal =>
+                                String(childVal.value).trim().toLowerCase() === String(val).trim()
+                                .toLowerCase()
+                            )
+                        );
                     } else {
                         shouldShow = true;
                     }
+
                     if (shouldShow) {
                         $(this).removeClass('d-none');
                     } else {
@@ -1365,45 +1368,43 @@
 
 
     function handleEditFieldVisibility() {
-        // Apply changes on select, checkbox, and radio inputs within the edit modal
         $('#edit-model').on('change', 'select, input[type="checkbox"], input[type="radio"]', function() {
-            var selectedValues = [];
+            let selectedValues = [];
+            const nameAttr = $(this).attr('name');
+            const nameWithoutBrackets = nameAttr.replace(/\[\]/g, ""); // Remove [] for matching
 
             if ($(this).is('select')) {
                 selectedValues = $(this).val();
             } else if ($(this).is('input[type="checkbox"]')) {
-                $('input[name="' + $(this).attr('name') + '"]:checked').each(function() {
-                    selectedValues.push($(this).val());
-                });
-            } else if ($(this).is('input[type="radio"]')) {
-                if ($(this).is(':checked')) {
-                    selectedValues.push($(this).val());
-                }
+                $('input[name="' + nameAttr.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + '"]:checked').each(
+                    function() {
+                        selectedValues.push($(this).val());
+                    });
+            } else if ($(this).is('input[type="radio"]') && $(this).is(':checked')) {
+                selectedValues.push($(this).val());
             }
-
-            var parentField = $(this).attr('name');
 
             if (!Array.isArray(selectedValues)) {
                 selectedValues = [selectedValues];
             }
 
-            // Loop through dependent fields and show/hide based on selected values
             $('#edit-model .dependent-field').each(function() {
-                var parent = $(this).data('parent');
-                var selectedValuesForChild = $(this).data('selected-values');
+                const parent = $(this).data('parent');
+                const selectedValuesForChild = $(this).data('selected-values');
 
-                if (parent === parentField) {
-                    var shouldShow = false;
+                if (parent === nameWithoutBrackets) {
+                    let shouldShow = false;
                     if (selectedValuesForChild && selectedValuesForChild.length > 0) {
-                        shouldShow = selectedValues.some(function(val) {
-                            return selectedValuesForChild.some(function(childVal) {
-                                return String(childVal.value).trim().toLowerCase() ===
-                                    String(val).trim().toLowerCase();
-                            });
-                        });
+                        shouldShow = selectedValues.some(val =>
+                            selectedValuesForChild.some(childVal =>
+                                String(childVal.value).trim().toLowerCase() === String(val).trim()
+                                .toLowerCase()
+                            )
+                        );
                     } else {
                         shouldShow = true;
                     }
+
                     if (shouldShow) {
                         $(this).removeClass('d-none');
                     } else {
@@ -1419,23 +1420,6 @@
     $(document).ready(function() {
         handleEditFieldVisibility(); // For the edit modal
     });
-
-
-
-    // Call this function once the modal is fully loaded or when dynamically adding fields
-    $(document).ready(function() {
-        handleEditFieldVisibility();
-    });
-
-
-
-
-
-
-
-
-
-
 
     function verify_by(user_id) {
         loader(true);
