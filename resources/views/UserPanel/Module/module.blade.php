@@ -555,17 +555,14 @@
         if (field['type'] == 'multi_layer_inline_dropdown') {
             var value_list = field['comma_separated_values'];
 
-            html_field +=
-                `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
+            html_field += `<select class="form-control" style="text-transform: capitalize;" id="${fieldName}" name="${fieldName}">`;
 
             // Add default "Select value" option
-            html_field +=
-                `<option value="">Select value</option>`;
+            html_field += `<option value="">Select value</option>`;
 
             for (var i = 0; i < value_list.length; i++) {
                 var isSelected = field['store_value'] && field['store_value'].trim() === value_list[i]['label'].trim();
-                html_field +=
-                    `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
+                html_field += `<option value="${String(value_list[i]['value']).trim()}" ${isSelected ? 'selected' : ''}>${value_list[i]['label'] ? String(value_list[i]['label']).trim().replace(/_/g, ' ') : value_list[i]['label']}</option>`;
             }
 
             html_field += `</select>`;
@@ -1036,23 +1033,24 @@
 
                 // Loop through the fields for the add modal
                 for (let i = 0; i < fields.length; i++) {
-                    if (fields[i]['type'] == 'multi_layer_inline_dropdown' && __check == 0) {
-                        html_field += `<div class="d-flex">`;
-                        __check = 1;
-                        __div = 1;
+                    if (fields[i]['type'] == 'multi_layer_inline_dropdown') {
+                        // Start a new flex container for multi-layer inline dropdown
+                        if (__check == 0) {
+                            html_field += `<div class="d-flex flex-wrap">`;
+                            __check = 1;
+                            __div = 1;
+                        }
                     }
 
-                    if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
-                        html_field += `</div>`;
-                        __check = 0;
-                        __div = 0;
-                    }
+                    // if (fields[i]['type'] != 'multi_layer_inline_dropdown' && __div == 1) {
+                    //     html_field += `</div>`;
+                    //     __check = 0;
+                    //     __div = 0;
+                    // }
 
                     // Main field creation
-                    html_field +=
-                        `<div class="mb-3 ${fields[i]['type'] == 'multi_layer_inline_dropdown' ? 'col-md-4 col-sm-4 me-1 d-none showAtChange' : ''}">`;
-                    html_field +=
-                        `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
+                    html_field += `<div class="mb-3 col-md-12 col-sm-12 me-1">`;
+                    html_field += `<label class="mb-1" style="text-transform:capitalize;">${fields[i]['option'].replace(/_/g, ' ')}</label>`;
 
                     // Main field HTML
                     html_field += create_field_html(fields[i], login_user);
